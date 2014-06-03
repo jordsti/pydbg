@@ -1,11 +1,13 @@
 __author__ = 'JordSti'
+import os
 
 
 class superhero:
 
-    def __init__(self):
+    def __init__(self, library):
         self.name = ""
         self.image_path = ""
+        self.library = library
         #abilities todo
 
     def from_file(self, filepath):
@@ -23,3 +25,6 @@ class superhero:
                 self.name = l[5:]
             elif l.startswith("image_path:"):
                 self.image_path = l[11:]
+
+    def get_image_path(self):
+        return os.path.join(self.library.lib_dir, self.image_path)

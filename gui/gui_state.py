@@ -11,6 +11,13 @@ class gui_state(base_state):
 
         self.elements = []
 
+    def bring_to_top(self, element):
+        if element in self.elements:
+            self.elements.remove(element)
+            self.elements.append(element)
+        else:
+            self.add(element)
+
     def paint(self, screen):
 
         for e in self.elements:
@@ -30,6 +37,7 @@ class gui_state(base_state):
             for e in self.elements:
                 if e.x <= event.pos[0] and e.x + e.width >= event.pos[0] and e.y <= event.pos[1] and e.y + e.height >= event.pos[1]:
                     e.on_click(event.button, event.pos[0] - e.x, event.pos[1] - e.y)
+
         elif event.type == pygame.MOUSEMOTION:
             for e in self.elements:
                 if e.x <= event.pos[0] and e.x + e.width >= event.pos[0] and e.y <= event.pos[1] and e.y + e.height >= event.pos[1]:

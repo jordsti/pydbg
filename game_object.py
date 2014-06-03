@@ -27,14 +27,14 @@ class game_object:
 
         for i in range(nb):
             card_id = self.library.get_card_by_name(self.library.buyable_power)
-            gcard = cards.game_card(card_id)
+            gcard = cards.game_card(card_id, self.library)
             self.buyable_powers.append(gcard)
 
         #curses
         nb = 20
         for i in range(nb):
             card_id = self.library.get_card_by_name(self.library.curse_card)
-            ccard = cards.game_card(card_id)
+            ccard = cards.game_card(card_id, self.library)
             self.curses.append(ccard)
 
         #generating main deck
@@ -44,7 +44,7 @@ class game_object:
 
             for i in range(nb):
                 try:
-                    gcard = cards.game_card(card_id)
+                    gcard = cards.game_card(card_id, self.library)
                     self.main_deck.push(gcard)
                 except AttributeError as e:
                     print e.message, k
@@ -55,7 +55,7 @@ class game_object:
         starters = self.library.get_starter()
         for p in self.players:
             for c_id in starters:
-                gcard = cards.game_card(c_id)
+                gcard = cards.game_card(c_id, self.library)
                 p.deck.push(gcard)
 
             p.deck.shuffle()

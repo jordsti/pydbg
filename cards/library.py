@@ -52,7 +52,7 @@ class library:
 
                 self.cards.append(c)
             elif os.path.isfile(path) and path.endswith(".superhero"):
-                s = superhero.superhero()
+                s = superhero.superhero(self)
                 s.from_file(path)
                 self.superheroes.append(s)
 

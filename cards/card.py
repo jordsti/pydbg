@@ -1,4 +1,5 @@
 __author__ = 'JordSti'
+import os
 
 
 class card:
@@ -58,3 +59,7 @@ class game_card(card):
         self.image_path = card_id.image_path
         self.cost = card_id.cost
         self.value = card_id.value
+
+    def get_image_path(self):
+        p = os.path.join(self.library.lib_dir, self.image_path)
+        return p
