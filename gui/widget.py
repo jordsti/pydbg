@@ -32,6 +32,8 @@ class widget:
     def on_mouse_over(self, rel_x, rel_y):
         pass
 
+    def on_key(self, event):
+        pass
 
 class highlight_widget(widget):
 

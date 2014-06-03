@@ -47,6 +47,10 @@ class combobox(highlight_widget):
             self.dropdown_open = True
             self.height += self.dropdown_height
 
+    def get_item(self):
+        item = self.items[self.selected_index]
+        return item
+
     def render(self):
 
         color1 = self.background_color

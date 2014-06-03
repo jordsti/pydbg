@@ -49,8 +49,9 @@ def get_card_id():
 
 class game_card(card):
 
-    def __init__(self, card_id):
+    def __init__(self, card_id, library):
         card.__init__(self)
+        self.library = library
         self.card_id = get_card_id()
         self.name = card_id.name
         self.card_type = card_id.card_type

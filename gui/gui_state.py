@@ -36,6 +36,9 @@ class gui_state(base_state):
                     e.is_hover(True)
                 else:
                     e.is_hover(False)
+        if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
+            for e in self.elements:
+                e.on_key(event)
 
         elif event.type == pygame.QUIT:
             self.viewport._run = False
