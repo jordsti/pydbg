@@ -9,3 +9,4 @@ from picturebox import picturebox
 from font import *
 from combobox import combobox
 from textbox import textbox
+from point import point

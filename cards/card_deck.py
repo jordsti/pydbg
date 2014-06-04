@@ -20,6 +20,9 @@ class card_deck:
         else:
             raise Exception("No more card!")
 
+    def empty(self):
+        return len(self.__cards) == 0
+
     def shuffle(self, nb=100):
 
         for i in range(nb):

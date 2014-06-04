@@ -4,6 +4,14 @@ import random
 import cards
 
 
+class lineup_action:
+    (Added, Removed) = (0, 1)
+
+    def __init__(self, card, type=Added):
+        self.card = card
+        self.type = type
+
+
 class game_object:
 
     def __init__(self, library):
@@ -22,6 +30,79 @@ class game_object:
 
         self.change_turn = None
         self.card_played = None
+        self.lineup_changed = None
+
+    def buy_card(self, card):
+        current = self.get_current_player()
+        if card in self.lineups:
+            if card.cost <= current.total_power:
+                current.total_power -= card.cost
+                self.lineups.remove(card)
+                current.gained_cards.append(card)
+
+                if self.lineup_changed is not None:
+                    actions = [lineup_action(card, lineup_action.Removed)]
+                    self.lineup_changed(actions)
+
+        elif card in self.buyable_powers:
+            if card.cost <= current.total_power:
+                current.total_power -= card.cost
+                self.buyable_powers.remove(card)
+                current.gained_cards.append(card)
+
+    def end_turn(self):
+        current = self.get_current_player()
+
+        gained_cards = current.gained_cards
+
+        played_cards = current.played_cards
+
+        current.gained_cards = []
+        current.played_cards = []
+
+        for p in played_cards:
+            current.discard_pile.append(p)
+
+        for g in gained_cards:
+            current.discard_pile.append(g)
+
+        #pick new hand
+
+        if len(current.hand) > 0:
+            for c in current.hand:
+                current.discard_pile.append(c)
+            current.hand = []
+
+        nb = current.next_hand_size
+
+        for i in range(nb):
+            if not current.deck.empty():
+                c = current.deck.pop()
+                current.hand.append(c)
+            else:
+                for c in current.discard_pile:
+                    current.deck.push(c)
+
+                current.discard_pile = []
+
+                current.deck.shuffle()
+                c = current.deck.pop()
+                current.hand.append(c)
+
+        #fill lineups
+        actions = []
+        while len(self.lineups) < 5 and not self.main_deck.empty():
+            card = self.main_deck.pop()
+            self.lineups.append(card)
+            actions.append(lineup_action(card, lineup_action.Added))
+
+        if len(actions) > 0:
+            if self.lineup_changed is not None:
+                self.lineup_changed(actions)
+
+        #changing turn
+        current.is_playing = False
+        self.change_player_turn()
 
     def change_player_turn(self):
 
@@ -30,11 +111,15 @@ class game_object:
         if self.current_player >= len(self.players):
             self.current_player %= len(self.players)
 
+        current = self.get_current_player()
+        current.is_playing = True
+        current.total_power = 0
+
         if self.current_player == self.starting_player:
             self.turns += 1
-
+            print "Turn complete %d " % self.turns
         if self.change_turn is not None:
-            self.change_turn(self.get_current_player())
+            self.change_turn(current)
 
     def get_current_player(self):
         return self.players[self.current_player]
@@ -108,7 +193,6 @@ class game_object:
                 p.hand.append(c)
 
         #line up
-
         for i in range(5):
             self.lineups.append(self.main_deck.pop())
 

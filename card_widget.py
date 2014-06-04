@@ -12,8 +12,8 @@ class card_widget(widget):
         self.btn_width = 120
         self.btn_height = 30
 
-        self.play_card = None
-        self.player = None
+        self.activated = None
+
         self.card = card
         self.state = state
         if card is not None:
@@ -86,7 +86,7 @@ class card_widget(widget):
                     self.y = self.last_y
                     self.resize(self.last_width, self.last_height)
                     self.state.card_zoomed = False
-                    if self.play_card is not None:
-                        self.play_card(self.player, self.card)
+                    if self.activated is not None:
+                        self.activated(self, self.card)
     def render(self):
         return self.image

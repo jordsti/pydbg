@@ -12,6 +12,8 @@ class player:
         self.discard_pile = []
         self.played_cards = []
 
+        self.gained_cards = []
+
         self.total_power = 0
 
         self.deck = cards.card_deck()

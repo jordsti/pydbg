@@ -1,7 +1,7 @@
 __author__ = 'JordSti'
 
 import gui
-from game_object import game_object
+from game_object import *
 from card_widget import card_widget
 from player_widget import player_widget
 import cards
@@ -17,11 +17,18 @@ class game_state(gui.gui_state):
         self.players_cards = []
         self.played_cards = []
         self.player_widgets = []
+        self.current_player = None
+
+        self.lineup_width = 106
+        self.lineup_height = 150
+
+        self.zoom_width = 424
+        self.zoom_height = 600
 
         for p in players:
             self.game.add_player(p)
 
-        self.handle_quit = False
+        self.handle_quit = True
 
         self.card_zoomed = False
 
@@ -38,11 +45,11 @@ class game_state(gui.gui_state):
             self.player_widgets.append(widget)
             current_y += widget.height
 
-
         self.lineups = []
 
-        self.curse_stack = card_widget(self, self.game.curses[0], 106, 150)
+        self.lineups_empty_case = []
 
+        self.curse_stack = card_widget(self, self.game.curses[0], 106, 150)
         self.buyable_power_stack = card_widget(self, self.game.buyable_powers[0], 106, 150)
 
         self.add(self.curse_stack)
@@ -50,7 +57,6 @@ class game_state(gui.gui_state):
 
         l_start_x = 250
         l_start_y = 300
-
 
         self.curse_stack.x = l_start_x - 121*2
         self.curse_stack.y = l_start_y
@@ -83,10 +89,10 @@ class game_state(gui.gui_state):
 
         #turn info
         self.lbl_current_turn = gui.label()
-        self.lbl_current_turn.text = "%s turns" % (self.game.get_current_player().name)
+        self.lbl_current_turn.text = "%s turns" % self.game.get_current_player().name
 
-        self.lbl_current_turn.x = 10
-        self.lbl_current_turn.y = 100
+        self.lbl_current_turn.x = 5
+        self.lbl_current_turn.y = 5
 
         self.add(self.lbl_current_turn)
 
@@ -103,6 +109,10 @@ class game_state(gui.gui_state):
         self.play_x = 70
         self.play_y = 20
 
+        #todo need a place for gained cards, or a widget that pop up on button..
+        self.gained_card_x = 0
+        self.gained_card_y = 0
+
         #quit to main menu button
         self.btn_quit_game = gui.button(200, 30)
         self.btn_quit_game.x = 10
@@ -110,9 +120,17 @@ class game_state(gui.gui_state):
         self.btn_quit_game.caption = "Quit game"
         self.btn_quit_game.add_receivers(self.quit_game)
 
+        self.btn_end_turn = gui.button(200, 50)
+        self.btn_end_turn.caption = "End turn"
+        self.btn_end_turn.add_receivers(self.end_turn)
+
         self.game.change_turn = self.player_turn
         self.game.card_played = self.played_card
+        self.game.lineup_changed = self.apply_lineup_action
         self.game.start_game()
+
+    def buy_card(self, widget, card):
+        self.game.buy_card(card)
 
     def played_card(self, player, card):
         widget = card_widget(self, card, 91, 130)
@@ -139,42 +157,94 @@ class game_state(gui.gui_state):
                 self.players_cards.remove(c_widget)
                 break
 
+    def end_turn(self, src):
+        #removing played cards
+
+        for c in self.played_cards:
+            self.elements.remove(c)
+
+        self.played_cards = []
+
+        self.game.end_turn()
+        self.elements.remove(self.btn_end_turn)
 
     def quit_game(self, src):
         import main_menu
         state = main_menu.main_menu()
         self.viewport.push(state)
 
+    def apply_lineup_action(self, actions):
+        for a in actions:
+            if a.type == lineup_action.Removed:
+                for w in self.lineups:
+                    if a.card == w.card:
+                        self.lineups.remove(w)
+                        self.elements.remove(w)
+                        pt = gui.point(w.x, w.y)
+                        self.lineups_empty_case.append(pt)
+            elif a.type == lineup_action.Added:
+                pt = self.lineups_empty_case[0]
+                self.lineups_empty_case.remove(pt)
+
+                w = card_widget(self, a.card, self.lineup_width, self.lineup_height)
+                w.x = pt.x
+                w.y = pt.y
+                w.zoom_width = self.zoom_width
+                w.zoom_height = self.zoom_height
+
+                self.add(w)
+                self.lineups.append(w)
+
+    def refresh_lineups(self):
+
+        for w in self.lineups:
+            w.activated = self.buy_card
+
+        if len(self.game.buyable_powers) > 0:
+            self.buyable_power_stack.activated = self.buy_card
+
     def player_turn(self, player):
-        self.lbl_current_turn.text = "%s's turn !" % (player.name)
+        print "turn-> " + player.name
+        self.lbl_current_turn.text = "%s's turn !" % player.name
+        self.current_player = player
         #card view
         cards = player.hand
 
         ix = 0
         for c in cards:
             widget = card_widget(self, c, 91, 130)
-            #maybe special widget to play a card
-            widget.player = player
             widget.x = self.hand_x + ix
             widget.y = self.hand_y
             widget.zoom_width = 424
             widget.zoom_height = 600
             self.players_cards.append(widget)
             self.add(widget)
-            widget.play_card = self.game.play_card
+            widget.activated = self.play_card
             ix += widget.width + 10
 
+        self.refresh_lineups()
+
+    def play_card(self, widget, card):
+        self.game.play_card(self.current_player, card)
+
     def tick(self):
-        pass
+        if self.current_player is not None:
+            if len(self.current_player.hand) == 0:
+                if self.btn_end_turn not in self.elements:
+                    self.btn_end_turn.x = self.hand_x
+                    self.btn_end_turn.y = self.hand_y
+                    self.add(self.btn_end_turn)
 
     def init(self):
         for w in self.player_widgets:
             w.x = self.width - w.width
-
-
 
     def on_event(self, event):
         gui.gui_state.on_event(self, event)
 
         if event.type == pygame.KEYDOWN:
             print event.unicode
+        elif event.type == pygame.QUIT:
+            import main_menu
+            state = main_menu.main_menu()
+            self.viewport.push(state)
