@@ -10,6 +10,7 @@ class widget:
         self.height = height
         self.x = 0
         self.y = 0
+        self.visible = True
 
         self.background_color = 0, 0, 0
         self.foreground_color = 250, 250, 250

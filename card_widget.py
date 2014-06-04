@@ -8,6 +8,12 @@ class card_widget(widget):
 
     def __init__(self, state, card=None, width=0, height=0):
         widget.__init__(self, "card_widget", width, height)
+
+        self.btn_width = 120
+        self.btn_height = 30
+
+        self.play_card = None
+        self.player = None
         self.card = card
         self.state = state
         if card is not None:
@@ -64,5 +70,23 @@ class card_widget(widget):
         self.height = height
         self.image = pygame.transform.scale(self.raw_image, (self.width, self.height))
 
+    def on_key(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                if self.zoomed:
+                    self.zoomed = False
+                    self.x = self.last_x
+                    self.y = self.last_y
+                    self.resize(self.last_width, self.last_height)
+                    self.state.card_zoomed = False
+            elif event.key == pygame.K_RETURN:
+                if self.zoomed:
+                    self.zommed = False
+                    self.x = self.last_x
+                    self.y = self.last_y
+                    self.resize(self.last_width, self.last_height)
+                    self.state.card_zoomed = False
+                    if self.play_card is not None:
+                        self.play_card(self.player, self.card)
     def render(self):
         return self.image

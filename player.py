@@ -8,7 +8,14 @@ class player:
         self.player_id = player_id
         self.name = name
         self.superhero = None
-
+        self.next_hand_size = 5
         self.discard_pile = []
+        self.played_cards = []
+
+        self.total_power = 0
 
         self.deck = cards.card_deck()
+
+        self.is_playing = False
+
+        self.hand = []

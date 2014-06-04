@@ -12,13 +12,56 @@ class game_object:
         self.library = library
         self.starting_player = None
         self.current_player = None
-
+        self.turns = 0
         self.lineups = []
 
         self.buyable_powers = []
         self.curses = []
 
         self.main_deck = cards.card_deck()
+
+        self.change_turn = None
+        self.card_played = None
+
+    def change_player_turn(self):
+
+        self.current_player += 1
+
+        if self.current_player >= len(self.players):
+            self.current_player %= len(self.players)
+
+        if self.current_player == self.starting_player:
+            self.turns += 1
+
+        if self.change_turn is not None:
+            self.change_turn(self.get_current_player())
+
+    def get_current_player(self):
+        return self.players[self.current_player]
+
+    def play_card(self, player, card):
+        if player == self.get_current_player():
+            if card in player.hand:
+                player.played_cards.append(card)
+
+                if self.card_played is not None:
+                    self.card_played(player, card)
+
+                player.hand.remove(card)
+                self.apply_card(card)
+            else:
+                print "Error 2"
+        else:
+            print "Error 1"
+
+    def apply_card(self, card):
+        player = self.get_current_player()
+        for a in card.abilities:
+            if len(a.pre_conditions) == 0:
+                if a.type == cards.ability.Passive:
+                    for b in a.bonus:
+                        if b.type == cards.bonus.Power:
+                            player.total_power += b.nb
 
     def create_cards(self):
 
@@ -60,10 +103,21 @@ class game_object:
 
             p.deck.shuffle()
 
+            for c in range(5):
+                c = p.deck.pop()
+                p.hand.append(c)
+
         #line up
 
         for i in range(5):
             self.lineups.append(self.main_deck.pop())
+
+    def start_game(self):
+        self.turns += 1
+        if self.change_turn is not None:
+            player = self.get_current_player()
+            player.is_playing = True
+            self.change_turn(player)
 
     def add_player(self, name):
         p = player.player(self.player_count, name)

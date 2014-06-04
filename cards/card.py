@@ -1,6 +1,6 @@
 __author__ = 'JordSti'
 import os
-
+from ability import *
 
 class card:
 
@@ -10,6 +10,7 @@ class card:
         self.image_path = ""
         self.cost = 0
         self.value = 0
+        self.abilities = []
         #many things to add
 
     def from_file(self, filepath):
@@ -32,7 +33,11 @@ class card:
                 self.cost = int(l[5:])
             elif l.startswith("value:"):
                 self.value = int(l[6:])
-
+            elif l.startswith("ability:"):
+                ab = l[8:]
+                abi = ability()
+                abi.from_string(ab)
+                self.abilities.append(abi)
 
 game_card_id = 0
 
@@ -59,6 +64,7 @@ class game_card(card):
         self.image_path = card_id.image_path
         self.cost = card_id.cost
         self.value = card_id.value
+        self.abilities = card_id.abilities
 
     def get_image_path(self):
         p = os.path.join(self.library.lib_dir, self.image_path)

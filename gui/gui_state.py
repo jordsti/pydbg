@@ -21,12 +21,12 @@ class gui_state(base_state):
     def paint(self, screen):
 
         for e in self.elements:
+            if e.visible:
+                surface = e.render()
 
-            surface = e.render()
-
-            dst_rect = pygame.Rect(e.x, e.y, e.width, e.height)
-            #print e.width, e.height, " %d, %d " % (surface.get_width(), surface.get_height())
-            screen.blit(surface, dst_rect)
+                dst_rect = pygame.Rect(e.x, e.y, e.width, e.height)
+                #print e.width, e.height, " %d, %d " % (surface.get_width(), surface.get_height())
+                screen.blit(surface, dst_rect)
 
     def add(self, element):
         self.elements.append(element)
