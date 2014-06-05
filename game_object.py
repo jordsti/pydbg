@@ -187,7 +187,7 @@ class game_object:
                 if ability.condition.cond == cards.condition.MinCard:
                     if ability.condition.test == cards.condition.CardType:
                         if ability.condition.where == cards.condition.PlayedCard:
-                            #min card with card type, #martian manhunter and cyborg case
+                            #min card with card type, #martian manhunter
                             card_count = 0
                             for c in player.played_cards:
                                 if c.card_type == ability.condition.value:
@@ -198,18 +198,31 @@ class game_object:
 
                                 if not player.contains_superhero_bonus(sb):
                                     player.superhero_bonuses.append(sb)
+
                 elif ability.condition.cond == cards.condition.FirstPlayed:
                     if ability.condition.test == cards.condition.CardAbility:
                         if ability.condition.where == cards.condition.PlayedCard:
                             #flash case
                             for a in played_card.abilities:
                                 if a.bonus is not None:
+                                    print "FirstPlayed, CardAbility, PlayedCard", a.bonus.type, cards.get_bonus_type(ability.condition.value)
                                     if a.bonus.type == cards.get_bonus_type(ability.condition.value):
 
                                         sb = cards.superhero_bonus(player.superhero, ability, ability.bonus)
 
                                         if not player.contains_superhero_bonus(sb):
+                                            print "FLASH ABILITY"  # debug out
                                             player.superhero_bonuses.append(sb)
+
+                    elif ability.condition.test == cards.condition.CardType:
+                        if ability.condition.where == cards.condition.PlayedCard:
+                            #cybord case
+                            if played_card.card_type == ability.condition.value:
+
+                                sb = cards.superhero_bonus(player.superhero, ability, ability.bonus)
+
+                                if not player.contains_superhero_bonus(sb):
+                                    player.superhero_bonuses.append(sb)
 
                 elif ability.condition.cond == cards.condition.ForEach:
                     if ability.condition.test == cards.condition.CardType:
