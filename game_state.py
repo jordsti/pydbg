@@ -104,11 +104,16 @@ class game_state(gui.gui_state):
 
         self.add(self.lbl_hand)
 
+
         self.hand_x = 70
         self.hand_y = 160
+        self.hand_width = 91
+        self.hand_height = 130
 
         self.play_x = 70
         self.play_y = 20
+        self.play_width = 91
+        self.play_height = 130
 
         #todo need a place for gained cards, or a widget that pop up on button..
         self.gained_card_x = 0
@@ -143,7 +148,7 @@ class game_state(gui.gui_state):
         cx += 10
         cx += 130
 
-        w = card_widget(self, card, 91, 130)
+        w = card_widget(self, card, self.hand_width, self.hand_height)
         w.zoom_width = self.zoom_width
         w.zoom_height = self.zoom_height
         w.activated = self.play_card
@@ -168,7 +173,7 @@ class game_state(gui.gui_state):
             self.game.buy_card(card)
 
     def played_card(self, player, card):
-        widget = card_widget(self, card, 91, 130)
+        widget = card_widget(self, card, self.play_width, self.play_height)
         if len(self.played_cards) > 0:
             last = self.played_cards[len(self.played_cards)-1]
             x = last.x + 10 + last.width
@@ -180,8 +185,8 @@ class game_state(gui.gui_state):
             y = self.play_y
             widget.x = x
             widget.y = y
-        widget.zoom_width = 424
-        widget.zoom_height = 600
+        widget.zoom_width = self.zoom_width
+        widget.zoom_height = self.zoom_height
 
         self.played_cards.append(widget)
         self.add(widget)
@@ -247,11 +252,11 @@ class game_state(gui.gui_state):
 
         ix = 0
         for c in cards:
-            widget = card_widget(self, c, 91, 130)
+            widget = card_widget(self, c, self.hand_width, self.hand_height)
             widget.x = self.hand_x + ix
             widget.y = self.hand_y
-            widget.zoom_width = 424
-            widget.zoom_height = 600
+            widget.zoom_width = self.zoom_width
+            widget.zoom_height = self.zoom_height
             self.players_cards.append(widget)
             self.add(widget)
             widget.activated = self.play_card
