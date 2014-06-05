@@ -233,6 +233,19 @@ class game_object:
                                     if count >= c.count:
                                         for b in a.bonus:
                                             bonuses.append(b)
+                        elif c.cond == cards.condition.MinCost:
+                            if c.test == cards.condition.CardCost:
+                                if c.where == cards.condition.DeckTopCard:
+                                    #power ring case
+                                    if current.deck.empty():
+                                        current.remake_deck()
+
+                                    top_card = current.deck.reveal()
+
+                                    if top_card >= int(c.value):
+                                        for b in a.bonus:
+                                            bonuses.append(b)
+
             for b in bonuses:
                 if b.type == cards.bonus.Power:
                     current.total_power += b.nb
@@ -240,7 +253,7 @@ class game_object:
                     for i in range(b.nb):
                         self.draw_player_card(current)
 
-                print "Bonus from %s, %d, %d" (superhero.name, b.type, b.nb)
+                print "Bonus from %s, %d, %d" % (superhero.name, b.type, b.nb)
 
             current.passive_superhero = True
 

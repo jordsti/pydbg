@@ -22,3 +22,12 @@ class player:
         self.is_playing = False
 
         self.hand = []
+
+    def remake_deck(self):
+
+        for c in self.discard_pile:
+            self.deck.push(c)
+
+        self.discard_pile = []
+
+        self.deck.shuffle()
