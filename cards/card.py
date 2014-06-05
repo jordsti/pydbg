@@ -23,7 +23,10 @@ class card:
 
         for l in lines:
             l = l.rstrip('\n').rstrip('\r')
-            if l.startswith("name:"):
+            if l.startswith("#"):
+                #comment
+                continue
+            elif l.startswith("name:"):
                 self.name = l[5:]
             elif l.startswith("card_type:"):
                 self.card_type = l[10:]

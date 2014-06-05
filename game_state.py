@@ -31,6 +31,7 @@ class game_state(gui.gui_state):
         self.handle_quit = True
 
         self.card_zoomed = False
+        self.zoomed_widget = None
 
         self.game.pick_superhero()
 
@@ -127,10 +128,44 @@ class game_state(gui.gui_state):
         self.game.change_turn = self.player_turn
         self.game.card_played = self.played_card
         self.game.lineup_changed = self.apply_lineup_action
+        self.buyable_power_stack.activated = self.buy_card
+        self.game.drawn_card = self.drawn_card
         self.game.start_game()
 
+    def drawn_card(self, player, card):
+        #take empty hand card place todo
+        cx = 0
+
+        for w in self.players_cards:
+            if w.x > cx:
+                cx = w.x
+
+        cx += 10
+        cx += 130
+
+        w = card_widget(self, card, 91, 130)
+        w.zoom_width = self.zoom_width
+        w.zoom_height = self.zoom_height
+        w.activated = self.play_card
+
+        w.x = cx
+        w.y = self.hand_y
+
+        self.add(w)
+        self.players_cards.append(w)
+
+
     def buy_card(self, widget, card):
-        self.game.buy_card(card)
+        if card in self.game.buyable_powers:
+            rs = self.game.buy_card(card)
+
+            if rs and len(self.game.buyable_powers) > 0:
+                self.buyable_power_stack.card = self.game.buyable_powers[0]
+            elif len(self.game.buyable_powers) == 0:
+                self.elements.remove(self.buyable_power_stack)
+
+        else:
+            self.game.buy_card(card)
 
     def played_card(self, player, card):
         widget = card_widget(self, card, 91, 130)
@@ -223,6 +258,7 @@ class game_state(gui.gui_state):
             ix += widget.width + 10
 
         self.refresh_lineups()
+
 
     def play_card(self, widget, card):
         self.game.play_card(self.current_player, card)

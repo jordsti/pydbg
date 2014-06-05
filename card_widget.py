@@ -58,6 +58,8 @@ class card_widget(widget):
 
             self.state.card_zoomed = True
 
+            self.state.zoomed_widget = self
+
         elif self.zoomed:
             self.state.card_zoomed = False
             self.x = self.last_x
@@ -73,20 +75,21 @@ class card_widget(widget):
     def on_key(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                if self.zoomed:
+                if self.zoomed and self.state.zoomed_widget == self:
                     self.zoomed = False
                     self.x = self.last_x
                     self.y = self.last_y
                     self.resize(self.last_width, self.last_height)
                     self.state.card_zoomed = False
             elif event.key == pygame.K_RETURN:
-                if self.zoomed:
-                    self.zommed = False
+                if self.zoomed and self.state.zoomed_widget == self:
+                    self.zoomed = False
                     self.x = self.last_x
                     self.y = self.last_y
                     self.resize(self.last_width, self.last_height)
                     self.state.card_zoomed = False
                     if self.activated is not None:
                         self.activated(self, self.card)
+
     def render(self):
         return self.image

@@ -8,6 +8,7 @@ class player:
         self.player_id = player_id
         self.name = name
         self.superhero = None
+        self.passive_superhero = False
         self.next_hand_size = 5
         self.discard_pile = []
         self.played_cards = []

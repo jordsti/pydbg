@@ -20,6 +20,9 @@ class card_deck:
         else:
             raise Exception("No more card!")
 
+    def reveal(self):
+        return self.__cards[-1]
+
     def empty(self):
         return len(self.__cards) == 0
 
