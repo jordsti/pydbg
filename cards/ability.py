@@ -24,9 +24,20 @@ class bonus:
             self.nb = int(data[1])
 
 
+def get_bonus_type(text):
+    if text == 'Power':
+        return bonus.Power
+    elif text == 'CostReduction':
+        return bonus.CostReduction
+    elif text == 'DrawCard':
+        return bonus.DrawCard
+
+    return None
+
+
 class condition:
-    (MinCard, ForEach, MinCost) = (0, 1, 2)
-    (CardType, CardName, CardCost) = (0, 1, 2)
+    (MinCard, ForEach, MinCost, EmptyDiscardPile, FirstPlayed) = (0, 1, 2, 3, 4)
+    (CardType, CardName, CardCost, CardAbility) = (0, 1, 2, 3)
     (DiscardPile, PlayedCard, LineUp, DeckTopCard, GainedCard) = (0, 1, 2, 3, 4)
 
     def __init__(self, cond=MinCost, where=PlayedCard, value=""):
@@ -44,7 +55,10 @@ class condition:
 
     def from_string(self, text):
         data = text.split(':')
-        if len(data) >= 3:
+        nb_vars = len(data)
+
+        if nb_vars >= 1:
+            #condition
             cond = data[0].rstrip(':')
             if cond == 'MinCard':
                 self.cond = self.MinCard
@@ -52,12 +66,23 @@ class condition:
                 self.cond = self.ForEach
             elif cond == 'MinCost':
                 self.cond = self.MinCost
-
+            elif cond == 'EmtyDiscardPile':
+                self.cond == self.EmptyDiscardPile
+            elif cond == 'FirstPlayed':
+                self.cond = self.FirstPlayed
+        if nb_vars >= 2:
+            #test var
             test = data[1].rstrip(':')
 
             if test == 'CardType':
                 self.test = self.CardType
+            elif test == 'CardName':
+                self.test = self.CardName
+            elif test == 'CardAbility':
+                self.test = self.CardAbility
 
+        if nb_vars >= 3:
+            #where
             where = data[2].rstrip(':')
 
             if where == 'DiscardPile':
@@ -69,20 +94,25 @@ class condition:
             elif where == 'DeckTopCard':
                 self.where = self.DeckTopCard
 
-            if len(data) >= 4:
-                self.value = data[3]
+        if nb_vars >= 4:
+            #value
+            self.value = data[3]
 
-            if len(data) >= 5:
-                self.count = int(data[4])
+        if nb_vars >= 5:
+            #count
+            self.count = int(data[4])
+
 
 class ability:
     (Passive, Attack, Defense) = (0, 1, 2)
 
     def __init__(self, type=Passive):
         self.type = type
-        self.conditions = []
+        self.conditions = []  # need to rework this
+        self.condition = None
         self.pre_conditions = []
-        self.bonus = []
+        self.bonus = None
+        self.bonuses = [] # need rework on this too
 
     def from_string(self, text):
         data = text.split(',')
@@ -101,10 +131,22 @@ class ability:
                 bon = d[6:]
                 b = bonus()
                 b.from_string(bon)
-                self.bonus.append(b)
+                self.bonuses.append(b)
+                self.bonus = b
+
             elif d.startswith("condition:"):
                 cond = d[10:]
                 c = condition()
                 c.from_string(cond)
 
                 self.conditions.append(c)
+
+                self.condition = c
+
+
+class superhero_bonus:
+    def __init__(self, superhero, ability, bonus):
+        self.superhero = superhero
+        self.ability = ability
+        self.bonus = bonus
+        self.applied = False

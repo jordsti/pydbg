@@ -21,7 +21,10 @@ class card_deck:
             raise Exception("No more card!")
 
     def reveal(self):
-        return self.__cards[-1]
+        c = self.__cards[-1]
+        #debug trace
+        print "Revealed : %s" % c.name
+        return c
 
     def empty(self):
         return len(self.__cards) == 0

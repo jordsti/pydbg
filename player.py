@@ -23,6 +23,16 @@ class player:
 
         self.hand = []
 
+        self.superhero_bonuses = []
+
+    def contains_superhero_bonus(self, superhero_bonus):
+
+        for b in self.superhero_bonuses:
+            if b.superhero == superhero_bonus.superhero and b.bonus == superhero_bonus.bonus and b.ability == superhero_bonus.ability:
+                return True
+
+        return False
+
     def remake_deck(self):
 
         for c in self.discard_pile:

@@ -2,6 +2,7 @@ __author__ = 'JordSti'
 import os
 from ability import *
 
+
 class card:
 
     def __init__(self):

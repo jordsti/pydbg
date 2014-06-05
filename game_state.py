@@ -12,7 +12,7 @@ class game_state(gui.gui_state):
 
     def __init__(self, players):
         gui.gui_state.__init__(self)
-        self.library = cards.library("deck/pack1")
+        self.library = cards.library("../dc-deck/pack1")
         self.game = game_object(self.library)
         self.players_cards = []
         self.played_cards = []
@@ -278,9 +278,7 @@ class game_state(gui.gui_state):
     def on_event(self, event):
         gui.gui_state.on_event(self, event)
 
-        if event.type == pygame.KEYDOWN:
-            print event.unicode
-        elif event.type == pygame.QUIT:
+        if event.type == pygame.QUIT:
             import main_menu
             state = main_menu.main_menu()
             self.viewport.push(state)
