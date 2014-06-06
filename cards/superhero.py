@@ -11,7 +11,6 @@ class superhero:
         self.image_path = ""
         self.library = library
         self.abilities = []
-        #abilities todo
 
     def from_file(self, filepath):
 

@@ -3,7 +3,10 @@ import gui
 
 
 class game_setup_state(gui.gui_state):
-
+    # need todo
+    # combobox to pick superhero
+    # check box for all random
+    # duplicated hero ?
     def __init__(self):
         gui.gui_state.__init__(self)
 

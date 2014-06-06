@@ -99,10 +99,16 @@ class condition:
                 self.where = self.LineUp
             elif where == 'DeckTopCard':
                 self.where = self.DeckTopCard
+            elif where == 'GainedCard':
+                self.where = self.GainedCard
 
         if nb_vars >= 4:
             #value
-            self.value = data[3]
+            if '|' in data[3]:
+                self.value = data[3].split('|')
+            else:
+                self.value = [data[3]]
+
 
         if nb_vars >= 5:
             #count
@@ -110,7 +116,7 @@ class condition:
 
 
 class ability:
-    (Passive, Attack, Defense) = (0, 1, 2)
+    (Passive, Attack, Defense, EndOfTurn) = (0, 1, 2, 3)
 
     def __init__(self, type=Passive):
         self.type = type
@@ -133,6 +139,8 @@ class ability:
                     self.type = self.Attack
                 elif type == 'Defense':
                     self.type = self.Defense
+                elif type == 'EndOfTurn':
+                    self.type = self.EndOfTurn
             elif d.startswith("bonus:"):
                 bon = d[6:]
                 b = bonus()

@@ -59,6 +59,10 @@ class game_object:
         return False
 
     def end_turn(self):
+        #for wonderwoman specially
+        #need to split between end_turn_phase, todo like aquaman's trident and other...
+        self.end_turn_abilities()
+        self.apply_superhero_bonus()
 
         current = self.get_current_player()
 
@@ -178,6 +182,26 @@ class game_object:
                 print "Bonus from %s, %d, %d" % (player.superhero.name, bonus.bonus.type, bonus.bonus.nb)
                 bonus.applied = True
 
+    def end_turn_abilities(self):
+        current = self.get_current_player()
+
+        #superhero abilites
+        superhero = current.superhero
+
+        for a in superhero.abilities:
+            if a.type == cards.ability.EndOfTurn:
+                if a.condition is not None:
+                    if a.condition.cond == cards.condition.ForEach:
+                        if a.condition.test == cards.condition.CardType:
+                            if a.condition.where == cards.condition.GainedCard:
+                                #wonderwoman case
+                                for card in current.gained_cards:
+                                    if card.card_type in a.condition.value:
+                                        sb = cards.superhero_bonus(superhero, a, a.bonus)
+                                        current.superhero_bonuses.append(sb)
+
+        #card abilities
+        #todo
 
     def superhero_ability_check(self, played_card):
         #starting with martian manhunter case
@@ -236,13 +260,6 @@ class game_object:
 
                                 player.superhero_bonuses.append(sb)
                                 #i think existing check is not needed here
-                        elif ability.condition.where == cards.condition.GainedCard:
-                            #wonder woman
-                            #need to move this into bought_card check...
-                            #maybe aquaman ability will be in this too
-                            if played_card.card_type in ability.condition.value:
-                                sb = cards.superhero_bonus(player.superhero, ability, ability.bonus)
-                                player.superhero_bonuses.append(sb)
 
                 elif ability.condition.cond == cards.condition.ForEachDifferentName:
                     if ability.condition.test == cards.condition.CardType:
@@ -301,24 +318,34 @@ class game_object:
                 condition_ok = False
                 bonuses = []
                 c = a.condition
-                if c.cond == cards.condition.MinCard:
-                    if c.test == cards.condition.CardType:
-                        if c.where == cards.condition.PlayedCard:
-                            #high tech hero case
-                            count = 0
-                            for pcard in player.played_cards:
-                                if pcard.card_type in c.value:
-                                    count += 1
+                if a.type == cards.ability.Passive:
+                    if c.cond == cards.condition.MinCard:
+                        if c.test == cards.condition.CardType:
+                            if c.where == cards.condition.PlayedCard:
+                                #high tech hero case
+                                count = 0
+                                for pcard in player.played_cards:
+                                    if pcard.card_type in c.value:
+                                        count += 1
 
-                            if count >= c.count:
-                                condition_ok = True
+                                if count >= c.count:
+                                    condition_ok = True
 
-                                bonuses.append(a.bonus)
-                elif c.cond == cards.condition.EmptyDiscardPile:
-                    #mera case
-                    if len(player.discard_pile) == 0:
-                        condition_ok = True
-                        bonuses.append(a.bonus)
+                                    bonuses.append(a.bonus)
+                    elif c.cond == cards.condition.EmptyDiscardPile:
+                        #mera case
+                        if len(player.discard_pile) == 0:
+                            condition_ok = True
+                            bonuses.append(a.bonus)
+
+                    elif c.cond == cards.condition.MinCost:
+                        if c.test == cards.condition.CardCost:
+                            if c.where == cards.condition.DeckTopCard:
+                                #power ring
+                                card = player.deck.reveal()
+                                if card.cost >= int(c.value):
+                                    bonuses.append(a.bonus)
+                                    condition_ok = True
 
                 if condition_ok:
                     for b in bonuses:
@@ -329,70 +356,6 @@ class game_object:
                             for i in range(b.nb):
                                 c = self.draw_player_card(player)
                                 player.hand.append(c)
-
-    def apply_passive_superhero(self):
-        #need rework here !!!
-        return
-
-        current = self.get_current_player()
-
-        superhero = current.superhero
-
-        bonuses = []
-
-        if superhero.active and not current.passive_superhero:
-            for a in superhero.abilities:
-                if a.type == cards.ability.Passive:
-                    for c in a.conditions:
-                        if c.cond == cards.condition.ForEach and c.inner_condition is None:
-                            if c.test == cards.condition.CardType:
-                                if c.where == cards.condition.PlayedCard:
-                                    #batman case
-                                    count = 0
-                                    for card in current.played_cards:
-                                        if card.card_type in c.value:
-                                            count += 1
-                                    for i in range(count):
-                                        for b in a.bonus:
-                                            bonuses.append(b)
-
-                        elif c.cond == cards.condition.MinCard:
-                            if c.test == cards.condition.CardType:
-                                if c.where == cards.condition.PlayedCard:
-                                    count = 0
-                                    #martian manhunter case
-                                    for card in current.played_cards:
-                                        if card.card_type in c.value:
-                                            count += 1
-
-                                    if count >= c.count:
-                                        for b in a.bonus:
-                                            bonuses.append(b)
-                        elif c.cond == cards.condition.MinCost:
-                            if c.test == cards.condition.CardCost:
-                                if c.where == cards.condition.DeckTopCard:
-                                    #power ring case
-                                    if current.deck.empty():
-                                        current.remake_deck()
-
-                                    top_card = current.deck.reveal()
-
-                                    if top_card >= int(c.value):
-                                        for b in a.bonus:
-                                            bonuses.append(b)
-
-            for b in bonuses:
-                if b.type == cards.bonus.Power:
-                    current.total_power += b.nb
-                elif b.type == cards.bonus.DrawCard:
-                    for i in range(b.nb):
-                        self.draw_player_card(current)
-                elif b.type == cards.bonus.NextHandCard:
-                    current.next_hand_size += b.nb
-
-                print "Bonus from %s, %d, %d" % (superhero.name, b.type, b.nb)
-
-            current.passive_superhero = True
 
     def draw_player_card(self, player):
         if player.deck.empty():

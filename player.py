@@ -34,7 +34,8 @@ class player:
     def contains_superhero_bonus(self, superhero_bonus):
 
         for b in self.superhero_bonuses:
-            if b.superhero == superhero_bonus.superhero and b.bonus == superhero_bonus.bonus and b.ability == superhero_bonus.ability:
+            if b.superhero == superhero_bonus.superhero and b.bonus == superhero_bonus.bonus \
+                    and b.ability == superhero_bonus.ability:
                 return True
 
         return False
@@ -47,3 +48,14 @@ class player:
         self.discard_pile = []
 
         self.deck.shuffle()
+
+
+class player_choice:
+    (DiscardCard, DestroyCard, PlayerDeckTop, PlayerDeckBottom) = (0, 1, 2, 3)
+
+    def __init__(self, cards, destination=DiscardCard, count=1, may=False):
+        self.may = may
+        self.cards = cards
+        self.selected_cards = []
+        self.count = count
+        self.destination = destination
