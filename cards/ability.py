@@ -2,7 +2,7 @@ __author__ = 'JordSti'
 
 
 class bonus:
-    (Power, CostReduction, DrawCard) = (0, 1, 2)
+    (Power, CostReduction, DrawCard, NextHandCard) = (0, 1, 2, 3)
 
     def __init__(self, type=Power, nb=0):
         self.type = type
@@ -20,6 +20,8 @@ class bonus:
                 self.type = self.CostReduction
             elif type == 'DrawCard':
                 self.type = self.DrawCard
+            elif type == 'NextHandCard':
+                self.type = self.NextHandCard
 
             self.nb = int(data[1])
 
@@ -36,8 +38,8 @@ def get_bonus_type(text):
 
 
 class condition:
-    (MinCard, ForEach, MinCost, EmptyDiscardPile, FirstPlayed) = (0, 1, 2, 3, 4)
-    (CardType, CardName, CardCost, CardAbility) = (0, 1, 2, 3)
+    (MinCard, ForEach, MinCost, EmptyDiscardPile, FirstPlayed, ForEachDifferentName) = (0, 1, 2, 3, 4, 5)
+    (CardType, CardName, CardCost, CardAbility, CardDifferentNameCount) = (0, 1, 2, 3, 4)
     (DiscardPile, PlayedCard, LineUp, DeckTopCard, GainedCard) = (0, 1, 2, 3, 4)
 
     def __init__(self, cond=MinCost, where=PlayedCard, value=""):
@@ -70,6 +72,8 @@ class condition:
                 self.cond == self.EmptyDiscardPile
             elif cond == 'FirstPlayed':
                 self.cond = self.FirstPlayed
+            elif cond == 'ForEachDifferentName':
+                self.cond = self.ForEachDifferentName
         if nb_vars >= 2:
             #test var
             test = data[1].rstrip(':')
@@ -80,6 +84,8 @@ class condition:
                 self.test = self.CardName
             elif test == 'CardAbility':
                 self.test = self.CardAbility
+            elif test == 'CardDifferentNameCount':
+                self.test = self.CardDifferentNameCount
 
         if nb_vars >= 3:
             #where

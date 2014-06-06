@@ -9,7 +9,8 @@ class player:
         self.name = name
         self.superhero = None
         self.passive_superhero = False
-        self.next_hand_size = 5
+        self.base_hand_size = 5
+        self.next_hand_size = self.base_hand_size
         self.discard_pile = []
         self.played_cards = []
 
@@ -24,6 +25,11 @@ class player:
         self.hand = []
 
         self.superhero_bonuses = []
+
+    def clean_turn_vars(self):
+        self.superhero_bonuses = []
+        self.total_power = 0
+        self.next_hand_size = self.base_hand_size
 
     def contains_superhero_bonus(self, superhero_bonus):
 

@@ -146,7 +146,7 @@ class game_state(gui.gui_state):
                 cx = w.x
 
         cx += 10
-        cx += 130
+        cx += self.play_width
 
         w = card_widget(self, card, self.hand_width, self.hand_height)
         w.zoom_width = self.zoom_width

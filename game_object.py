@@ -62,8 +62,8 @@ class game_object:
 
         current = self.get_current_player()
 
-        current.passive_superhero = False
-        current.superhero_bonuses = []
+        #current.passive_superhero = False # not needed anymore, superhero abilities reworked
+        #current.superhero_bonuses = []
 
         gained_cards = current.gained_cards
 
@@ -100,6 +100,8 @@ class game_object:
                 current.deck.shuffle()
                 c = current.deck.pop()
                 current.hand.append(c)
+
+        current.clean_turn_vars()
 
         #fill lineups
         actions = []
@@ -170,6 +172,8 @@ class game_object:
 
                         if self.drawn_card is not None:
                             self.drawn_card(player, c)
+                elif bonus.bonus.type == cards.bonus.NextHandCard:
+                    player.next_hand_size += bonus.bonus.nb
 
                 print "Bonus from %s, %d, %d" % (player.superhero.name, bonus.bonus.type, bonus.bonus.nb)
                 bonus.applied = True
@@ -205,19 +209,17 @@ class game_object:
                             #flash case
                             for a in played_card.abilities:
                                 if a.bonus is not None:
-                                    print "FirstPlayed, CardAbility, PlayedCard", a.bonus.type, cards.get_bonus_type(ability.condition.value)
                                     if a.bonus.type == cards.get_bonus_type(ability.condition.value):
 
                                         sb = cards.superhero_bonus(player.superhero, ability, ability.bonus)
 
                                         if not player.contains_superhero_bonus(sb):
-                                            print "FLASH ABILITY"  # debug out
                                             player.superhero_bonuses.append(sb)
 
                     elif ability.condition.test == cards.condition.CardType:
                         if ability.condition.where == cards.condition.PlayedCard:
                             #cybord case
-                            if played_card.card_type == ability.condition.value:
+                            if played_card.card_type in ability.condition.value:
 
                                 sb = cards.superhero_bonus(player.superhero, ability, ability.bonus)
 
@@ -227,13 +229,56 @@ class game_object:
                 elif ability.condition.cond == cards.condition.ForEach:
                     if ability.condition.test == cards.condition.CardType:
                         if ability.condition.where == cards.condition.PlayedCard:
-                            if played_card.card_type == ability.condition.value:
+                            if played_card.card_type in ability.condition.value:
                                 #batman +1 power for each
 
                                 sb = cards.superhero_bonus(player.superhero, ability, ability.bonus)
 
                                 player.superhero_bonuses.append(sb)
                                 #i think existing check is not needed here
+                        elif ability.condition.where == cards.condition.GainedCard:
+                            #wonder woman
+                            #need to move this into bought_card check...
+                            #maybe aquaman ability will be in this too
+                            if played_card.card_type in ability.condition.value:
+                                sb = cards.superhero_bonus(player.superhero, ability, ability.bonus)
+                                player.superhero_bonuses.append(sb)
+
+                elif ability.condition.cond == cards.condition.ForEachDifferentName:
+                    if ability.condition.test == cards.condition.CardType:
+                        if ability.condition.where == cards.condition.PlayedCard:
+
+                            #superman case
+                            if played_card.card_type in ability.condition.value:
+                                #good type
+                                unique = True
+                                for c in player.played_cards:
+                                    if c.name == played_card.name and not c == played_card:
+                                        unique = False
+
+                                if unique:
+                                    #bonus can apply
+                                    sb = cards.superhero_bonus(player.superhero, ability, ability.bonus)
+                                    player.superhero_bonuses.append(sb)
+                elif ability.condition.cond == cards.condition.MinCost:
+                    if ability.condition.test == cards.condition.CardDifferentNameCount:
+                        if ability.condition.where == cards.condition.PlayedCard:
+                            #green latern
+                            min_cost = int(ability.condition.value[0])
+                            min_count = ability.condition.count
+                            card_names = []
+
+                            for c in player.played_cards:
+                                if c.cost >= min_cost:
+                                    if c.name not in card_names:
+                                        card_names.append(c.name)
+
+                            if len(card_names) >= min_count:
+                                #bonus available
+                                sb = cards.superhero_bonus(player.superhero, ability, ability.bonus)
+                                #only applying once
+                                if sb not in player.superhero_bonuses:
+                                    player.superhero_bonuses.append(sb)
 
 
     def apply_card(self, card):
@@ -273,6 +318,7 @@ class game_object:
                     #mera case
                     if len(player.discard_pile) == 0:
                         condition_ok = True
+                        bonuses.append(a.bonus)
 
                 if condition_ok:
                     for b in bonuses:
@@ -341,6 +387,8 @@ class game_object:
                 elif b.type == cards.bonus.DrawCard:
                     for i in range(b.nb):
                         self.draw_player_card(current)
+                elif b.type == cards.bonus.NextHandCard:
+                    current.next_hand_size += b.nb
 
                 print "Bonus from %s, %d, %d" % (superhero.name, b.type, b.nb)
 
