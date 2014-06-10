@@ -5,9 +5,11 @@ import pygame
 
 class card_selector(gui.widget):
 
-    def __init__(self, cards, width=0, height=0):
+    def __init__(self, cards, choice, width=0, height=0):
         gui.widget.__init__(self, "card_selector", width, height)
         self.cards = cards
+
+        self.choice = choice
 
         self.selected_cards = []
 
@@ -23,6 +25,8 @@ class card_selector(gui.widget):
 
         self.card_position = 0
 
+        self.closing = None
+
     def load_images(self):
 
         for card in self.cards:
@@ -33,10 +37,14 @@ class card_selector(gui.widget):
 
     def on_key(self, event):
 
-        if event.key == pygame.KEYDOWN and self.card_position > 0:
+        if event.key == pygame.K_UP and self.card_position > 0:
             self.card_position -= 1
-        elif event.key == pygame.KEYUP and self.card_position < len(self.cards):
+        elif event.key == pygame.K_DOWN and self.card_position < len(self.cards):
             self.card_position += 1
+        elif event.key == pygame.K_ESCAPE:
+            if self.closing is not None:
+                self.closing(self)
+
 
 
     def render(self):
@@ -48,7 +56,7 @@ class card_selector(gui.widget):
         card_pos = pygame.Rect(0, 0, self.card_width, self.card_height)
         #drawing  cards
 
-        cur_y = self.height - self.card_y_offset
+        cur_y = self.height - self.card_y_offset - self.card_height
         ic = 0
         for card in self.cards:
             if card not in self.selected_cards:

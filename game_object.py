@@ -32,6 +32,10 @@ class game_object:
         self.card_played = None
         self.lineup_changed = None
         self.drawn_card = None
+        self.ask_player = None
+
+        self.player_choices = []
+        self.pending_choice = None
 
     def buy_card(self, card):
         current = self.get_current_player()
@@ -58,11 +62,17 @@ class game_object:
 
         return False
 
-    def end_turn(self):
+    def end_turn_phase(self):
         #for wonderwoman specially
         #need to split between end_turn_phase, todo like aquaman's trident and other...
         self.end_turn_abilities()
         self.apply_superhero_bonus()
+
+        if self.pending_choice is None:
+            #no choice to take !
+            self.end_turn()
+
+    def end_turn(self):
 
         current = self.get_current_player()
 
@@ -187,7 +197,7 @@ class game_object:
 
         #superhero abilites
         superhero = current.superhero
-
+        #superhero.active check todo
         for a in superhero.abilities:
             if a.type == cards.ability.EndOfTurn:
                 if a.condition is not None:
@@ -199,6 +209,33 @@ class game_object:
                                     if card.card_type in a.condition.value:
                                         sb = cards.superhero_bonus(superhero, a, a.bonus)
                                         current.superhero_bonuses.append(sb)
+                else:
+                    #aquaman got no condition
+                    #superhero only..
+                    if a.action is not None:
+                        if a.action.type == cards.card_action.ChooseCard:
+                            source = None
+                            selected_cards = []
+                            if a.action.source == cards.card_action.GainedCard:
+                                source = current.gained_cards
+
+                            for card in source:
+                                if a.action.respect_constraint(card):
+                                    selected_cards.append(card)
+
+                            if len(selected_cards) > 0:
+                                #the player got to choose
+                                dest = None
+                                if a.action.destination == cards.card_action.PlayerDeckTop:
+                                    dest = player.player_choice.PlayerDeckTop
+
+                                choice = player.player_choice(selected_cards, dest, a.action.count, not a.action.forced)
+                                self.player_choices.append(choice)
+
+                                if self.pending_choice is None:
+                                    self.pending_choice = choice
+                                    if self.ask_player is not None:
+                                        self.ask_player(player, choice)
 
         #card abilities
         #todo

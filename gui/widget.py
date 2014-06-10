@@ -36,6 +36,13 @@ class widget:
     def on_key(self, event):
         pass
 
+    def get_rect(self):
+        return pygame.Rect(self.x, self.y, self.width, self.height)
+
+    def middle(self, dimension):
+        self.x = (dimension.width - self.width)/2
+        self.y = (dimension.height - self.height)/2
+
 class highlight_widget(widget):
 
     def __init__(self, widget_name="widget", width=0, height=0):

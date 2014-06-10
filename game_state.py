@@ -4,6 +4,7 @@ import gui
 from game_object import *
 from card_widget import card_widget
 from player_widget import player_widget
+from card_selector import *
 import cards
 import pygame
 
@@ -24,6 +25,7 @@ class game_state(gui.gui_state):
 
         self.zoom_width = 424
         self.zoom_height = 600
+        self.choice_overlay = None
 
         for p in players:
             self.game.add_player(p)
@@ -135,7 +137,18 @@ class game_state(gui.gui_state):
         self.game.lineup_changed = self.apply_lineup_action
         self.buyable_power_stack.activated = self.buy_card
         self.game.drawn_card = self.drawn_card
+        self.game.ask_player = self.ask_player
         self.game.start_game()
+
+    def ask_player(self, player, choice):
+        if self.choice_overlay is None:
+            selector = card_selector(choice.cards, choice, self.width - 300, self.height - 100)
+            selector.middle(self)
+            selector.closing = self.close_overlay
+            self.choice_overlay = selector
+        else:
+            #pending support todo
+            pass
 
     def drawn_card(self, player, card):
         #take empty hand card place todo
@@ -205,8 +218,15 @@ class game_state(gui.gui_state):
 
         self.played_cards = []
 
-        self.game.end_turn()
+        self.game.end_turn_phase()
         self.elements.remove(self.btn_end_turn)
+
+    def close_overlay(self, src):
+        #completing choice
+        #need to check if the choice is may or forced and respecting card count
+        #todo
+
+        self.choice_overlay = None
 
     def quit_game(self, src):
         import main_menu
@@ -281,9 +301,22 @@ class game_state(gui.gui_state):
             w.x = self.width - w.width
 
     def on_event(self, event):
-        gui.gui_state.on_event(self, event)
+        if self.choice_overlay is not None:
+            if event.type == pygame.KEYUP or event.type == pygame.KEYDOWN:
+                self.choice_overlay.on_key(event)
+        else:
+            gui.gui_state.on_event(self, event)
 
         if event.type == pygame.QUIT:
             import main_menu
             state = main_menu.main_menu()
             self.viewport.push(state)
+
+    def paint(self, screen):
+
+        gui.gui_state.paint(self, screen)
+
+        if self.choice_overlay is not None:
+            rect = pygame.Rect(self.choice_overlay.x, self.choice_overlay.y, self.choice_overlay.width, self.choice_overlay.height)
+
+            screen.blit(self.choice_overlay.render(), rect)

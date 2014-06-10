@@ -1,7 +1,6 @@
 __author__ = 'JordSti'
 
 import gui
-import cards
 import main_menu
 
 if __name__ == '__main__':

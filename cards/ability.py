@@ -1,4 +1,5 @@
 __author__ = 'JordSti'
+from card_action import card_action
 
 
 class bonus:
@@ -125,6 +126,7 @@ class ability:
         self.pre_conditions = []
         self.bonus = None
         self.bonuses = [] # need rework on this too
+        self.action = None
 
     def from_string(self, text):
         data = text.split(',')
@@ -156,6 +158,13 @@ class ability:
                 self.conditions.append(c)
 
                 self.condition = c
+
+            elif d.startswith("action:"):
+                action = d[7:]
+                a = card_action()
+                a.from_string(action)
+                self.action = a
+
 
 
 class superhero_bonus:
