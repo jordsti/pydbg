@@ -192,6 +192,11 @@ class game_object:
                 print "Bonus from %s, %d, %d" % (player.superhero.name, bonus.bonus.type, bonus.bonus.nb)
                 bonus.applied = True
 
+    def complete_choice(self, choice):
+        #todo
+
+        pass
+
     def end_turn_abilities(self):
         current = self.get_current_player()
 

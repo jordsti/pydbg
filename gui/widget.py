@@ -43,6 +43,10 @@ class widget:
         self.x = (dimension.width - self.width)/2
         self.y = (dimension.height - self.height)/2
 
+    def contains(self, x, y):
+        return self.x <= x and self.y <= y and self.x + self.width >= x and self.y + self.height >= y
+
+
 class highlight_widget(widget):
 
     def __init__(self, widget_name="widget", width=0, height=0):

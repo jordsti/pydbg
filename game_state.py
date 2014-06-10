@@ -225,6 +225,8 @@ class game_state(gui.gui_state):
         #completing choice
         #need to check if the choice is may or forced and respecting card count
         #todo
+        selected_cards = self.choice_overlay.selected_cards
+        self.game.complete_choice(self.choice_overlay.choice)
 
         self.choice_overlay = None
 
@@ -304,6 +306,9 @@ class game_state(gui.gui_state):
         if self.choice_overlay is not None:
             if event.type == pygame.KEYUP or event.type == pygame.KEYDOWN:
                 self.choice_overlay.on_key(event)
+            elif event.type == pygame.MOUSEMOTION:
+                pass
+                #todo
         else:
             gui.gui_state.on_event(self, event)
 
