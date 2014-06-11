@@ -1,5 +1,6 @@
 __author__ = 'JordSti'
 import pygame
+import style
 
 
 class widget:
@@ -11,9 +12,11 @@ class widget:
         self.x = 0
         self.y = 0
         self.visible = True
+        self.focus = False
+        self.style = style.get_style()
 
-        self.background_color = 0, 0, 0
-        self.foreground_color = 250, 250, 250
+        self.background_color = self.style.background_color
+        self.foreground_color = self.style.foreground_color
 
         self.hover = False
 
@@ -52,6 +55,6 @@ class highlight_widget(widget):
     def __init__(self, widget_name="widget", width=0, height=0):
         widget.__init__(self, widget_name, width, height)
 
-        self.highlight_background_color = 150, 150, 150
-        self.highlight_foreground_color = 10, 10, 10
+        self.highlight_background_color = self.style.highlight_background_color
+        self.highlight_foreground_color = self.style.highlight_foreground_color
 

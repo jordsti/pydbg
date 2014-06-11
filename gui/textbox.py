@@ -10,7 +10,8 @@ class textbox(widget):
         widget.__init__(self, "textbox", width, height)
 
         self.font = font.get_font()
-        self.focus = False
+        # focus is added to widget class
+        #self.focus = False
         self.text = ""
         self.tick = 0
 

@@ -8,6 +8,7 @@ class viewport:
     def __init__(self, width, height):
         self.width = width
         self.height = height
+        self.background = 0, 0, 0
 
         self.current_state = None
         self._run = False
@@ -33,14 +34,14 @@ class viewport:
 
                     self.current_state.on_event(e)
 
-                self.screen.fill((0, 0, 0))
+                self.screen.fill(self.background)
 
                 self.current_state.tick()
                 self.current_state.paint(self.screen)
 
                 pygame.display.flip()
             else:
-                print "No state!!"
+                raise Exception("No state specified")
 
     def push(self, state):
 

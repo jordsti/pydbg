@@ -307,8 +307,15 @@ class game_state(gui.gui_state):
             if event.type == pygame.KEYUP or event.type == pygame.KEYDOWN:
                 self.choice_overlay.on_key(event)
             elif event.type == pygame.MOUSEMOTION:
-                pass
-                #todo
+                r_x = event.pos[0] - self.choice_overlay.x
+                r_y = event.pos[1] - self.choice_overlay.y
+                if self.choice_overlay.contains(r_x, r_y):
+                    self.choice_overlay.on_mouse_over(r_x, r_y)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                r_x = event.pos[0] - self.choice_overlay.x
+                r_y = event.pos[1] - self.choice_overlay.y
+                if self.choice_overlay.contains(r_x, r_y):
+                    self.choice_overlay.on_click(event.button, r_x, r_y)
         else:
             gui.gui_state.on_event(self, event)
 

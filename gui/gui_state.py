@@ -37,6 +37,9 @@ class gui_state(base_state):
             for e in self.elements:
                 if e.x <= event.pos[0] and e.x + e.width >= event.pos[0] and e.y <= event.pos[1] and e.y + e.height >= event.pos[1]:
                     e.on_click(event.button, event.pos[0] - e.x, event.pos[1] - e.y)
+                    e.focus = True
+                else:
+                    e.focus = False
 
         elif event.type == pygame.MOUSEMOTION:
             for e in self.elements:

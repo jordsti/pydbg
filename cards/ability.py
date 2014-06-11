@@ -166,7 +166,6 @@ class ability:
                 self.action = a
 
 
-
 class superhero_bonus:
     def __init__(self, superhero, ability, bonus):
         self.superhero = superhero

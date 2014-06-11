@@ -12,7 +12,7 @@ class card_selector(gui.widget):
     def __init__(self, cards, choice, width=0, height=0):
         gui.widget.__init__(self, "card_selector", width, height)
 
-        self.font = gui.get_font()
+        self.font = gui.get_big_font()
 
         if not choice.count == -1:
             self.title = "Choose %d card(s)" % choice.count
@@ -43,7 +43,11 @@ class card_selector(gui.widget):
 
         self.btn_accept = gui.button(100, 30)
         self.btn_accept.caption = "Accept"
+        self.btn_accept.add_receivers(self.accept)
 
+    def accept(self, src):
+        print "BTN ACCEPT"
+        #todo
 
     def load_images(self):
 
@@ -57,13 +61,15 @@ class card_selector(gui.widget):
 
         if event.key == pygame.K_UP and self.card_position > 0:
             self.card_position -= 1
+
         elif event.key == pygame.K_DOWN and self.card_position < len(self.cards):
             self.card_position += 1
+
         elif event.key == pygame.K_ESCAPE:
             if self.closing is not None:
                 self.closing(self)
-        elif event.key == pygame.K_RETURN and event.type == pygame.KEYUP:
 
+        elif event.key == pygame.K_RETURN and event.type == pygame.KEYUP:
             if len(self.possible_choice) > self.card_position:
                 if len(self.selected_cards) < self.choice.count or self.choice.count == -1:
                     print "selecting card : ", self.card_position
@@ -77,16 +83,17 @@ class card_selector(gui.widget):
         print "Current Card : ", self.card_position # debug purpose
 
     def on_mouse_over(self, rel_x, rel_y):
-
         if self.btn_accept.contains(rel_x, rel_y):
             self.btn_accept.is_hover(True)
         else:
             self.btn_accept.is_hover(False)
 
+    def on_click(self, button, rel_x, rel_y):
+        if self.btn_accept.contains(rel_x, rel_y):
+            self.btn_accept.on_click(button, rel_x - self.btn_accept.x, rel_y - self.btn_accept.y)
+
     def render(self):
-
         buffer = pygame.Surface((self.width, self.height))
-
         buffer.fill(self.background_color)
 
         #text caption

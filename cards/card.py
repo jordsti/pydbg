@@ -12,6 +12,7 @@ class card:
         self.cost = 0
         self.value = 0
         self.abilities = []
+        self.on_going = False
         #many things to add
 
     def from_file(self, filepath):
@@ -42,6 +43,10 @@ class card:
                 abi = ability()
                 abi.from_string(ab)
                 self.abilities.append(abi)
+            elif l.startswith("ongoing:"):
+                og = l[8:]
+                if og == 'true':
+                    self.on_going = True
 
 game_card_id = 0
 
@@ -69,6 +74,7 @@ class game_card(card):
         self.cost = card_id.cost
         self.value = card_id.value
         self.abilities = card_id.abilities
+        self.on_going = card_id.on_going
 
     def get_image_path(self):
         p = os.path.join(self.library.lib_dir, self.image_path)
