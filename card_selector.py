@@ -3,7 +3,6 @@ import gui
 import pygame
 
 # todo
-# add accept button
 # add reset button, to replace cards into possible choice
 
 
@@ -45,6 +44,14 @@ class card_selector(gui.widget):
         self.btn_accept.caption = "Accept"
         self.btn_accept.add_receivers(self.accept)
 
+        self.btn_reset = gui.button(100, 30)
+        self.btn_reset.caption = "Reset"
+        self.btn_reset.add_receivers(self.reset)
+
+    def reset(self, src):
+        print "RESET"
+        #todo
+
     def accept(self, src):
         print "BTN ACCEPT"
         #todo
@@ -80,7 +87,7 @@ class card_selector(gui.widget):
                     if self.card_position == len(self.possible_choice) and self.card_position > 0:
                         self.card_position -= 1
 
-        print "Current Card : ", self.card_position # debug purpose
+        print "Current Card : ", self.card_position  # debug purpose
 
     def on_mouse_over(self, rel_x, rel_y):
         if self.btn_accept.contains(rel_x, rel_y):
@@ -91,6 +98,8 @@ class card_selector(gui.widget):
     def on_click(self, button, rel_x, rel_y):
         if self.btn_accept.contains(rel_x, rel_y):
             self.btn_accept.on_click(button, rel_x - self.btn_accept.x, rel_y - self.btn_accept.y)
+        elif self.btn_reset.contains(rel_x, rel_y):
+            self.btn_reset.on_click(button, rel_x - self.btn_reset.x, rel_y - self.btn_reset.y)
 
     def render(self):
         buffer = pygame.Surface((self.width, self.height))
@@ -138,15 +147,18 @@ class card_selector(gui.widget):
 
         pygame.draw.rect(buffer, self.foreground_color, border, 2)
 
-        #rendering button
-        button = self.btn_accept.render()
+        #placing reset button
+        if self.btn_reset.x == 0 and self.btn_reset.y == 0:
+            self.btn_reset.x = self.width - 10 - self.btn_reset.width
+            self.btn_reset.y = self.height - 10 - self.btn_reset.height
 
-        #placing the button
+        #placing accept button
         if self.btn_accept.x == 0 and self.btn_accept.y == 0:
             self.btn_accept.x = self.width - 10 - self.btn_accept.width
-            self.btn_accept.y = self.height - 10 - self.btn_accept.height
+            self.btn_accept.y = self.btn_reset.y - 10 - self.btn_accept.height
 
-        buffer.blit(button, self.btn_accept.get_rect())
+        buffer.blit(self.btn_accept.render(), self.btn_accept.get_rect())
+        buffer.blit(self.btn_reset.render(), self.btn_reset.get_rect())
 
         return buffer
 

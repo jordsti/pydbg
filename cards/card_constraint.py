@@ -53,12 +53,11 @@ class card_constraint(constraint):
                     return True
         elif self.var == self.Type:
             #only equals is handled !!
-
             if obj.card_type == self.value:
                 return True
         elif self.var == self.Power:
             pass
-            #todo
+            #todo , little problem here, need to parse the power with abilites..
 
         return False
 

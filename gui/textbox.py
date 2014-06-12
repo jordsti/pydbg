@@ -8,18 +8,14 @@ class textbox(widget):
 
     def __init__(self, width=0, height=0):
         widget.__init__(self, "textbox", width, height)
-
         self.font = font.get_font()
-        # focus is added to widget class
-        #self.focus = False
         self.text = ""
         self.tick = 0
-
+        self.text_changed = None
 
     def on_click(self, button, rel_x, rel_y):
         if not self.focus:
             self.focus = True
-            #.. todo
         else:
             self.focus = False
 
@@ -28,12 +24,17 @@ class textbox(widget):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
                     self.text = self.text[0:-1]
+                    self.text_change()
                 elif event.key == pygame.K_RETURN:
                     self.focus = False
                 else:
                     text = event.unicode
                     self.text += text
+                    self.text_change()
 
+    def text_change(self):
+        if self.text_changed is not None:
+            self.text_changed(self)
 
     def render(self):
 

@@ -37,6 +37,13 @@ class gui_state(base_state):
             for e in self.elements:
                 if e.x <= event.pos[0] and e.x + e.width >= event.pos[0] and e.y <= event.pos[1] and e.y + e.height >= event.pos[1]:
                     e.on_click(event.button, event.pos[0] - e.x, event.pos[1] - e.y)
+                    #combobox hotfix
+                    #todo
+                    #find another way to do this !!!
+
+                    if e.widget_name == 'combobox':
+                        self.bring_to_top(e)
+                        break
                     e.focus = True
                 else:
                     e.focus = False
