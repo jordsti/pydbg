@@ -1,6 +1,7 @@
 __author__ = 'JordSti'
 import gui
 import pygame
+from player import player_choice
 
 # todo
 # add reset button, to replace cards into possible choice
@@ -13,10 +14,21 @@ class card_selector(gui.widget):
 
         self.font = gui.get_big_font()
 
+        card_result = ""
+
+        if choice.destination == player_choice.DiscardCard:
+            card_result = "discard"
+        elif choice.destination == player_choice.DestroyCard:
+            card_result = "destroy"
+        elif choice.destination == player_choice.PlayerDeckBottom:
+            card_result = "deck bottom"
+        elif choice.destination == player_choice.PlayerDeckTop:
+            card_result = "deck top"
+
         if not choice.count == -1:
-            self.title = "Choose %d card(s)" % choice.count
+            self.title = "Choose %d card(s) to %s" % (choice.count, card_result)
         else:
-            self.title = "Choose cards"
+            self.title = "Choose cards to %s" % card_result
 
         self.cards = cards
 
@@ -48,13 +60,31 @@ class card_selector(gui.widget):
         self.btn_reset.caption = "Reset"
         self.btn_reset.add_receivers(self.reset)
 
+        self.choice_done = None
+
     def reset(self, src):
-        print "RESET"
-        #todo
+        s_cards = self.selected_cards
+        self.selected_cards = []
+
+        for c in s_cards:
+            self.possible_choice.append(c)
+
+    def apply_choice(self):
+        for c in self.selected_cards:
+            self.choice.selected_cards.append(c)
 
     def accept(self, src):
-        print "BTN ACCEPT"
-        #todo
+        if not self.choice.may:
+            if len(self.selected_cards) == self.choice.count:
+                self.apply_choice()
+                if self.choice_done is not None:
+                    self.choice_done(self.choice)  # todo some testing
+            else:
+                print "You must choose %d cards !" % self.choice.count
+        else:
+            if self.choice_done is not None:
+                self.apply_choice()
+                self.choice_done(self.choice)  # todo some testing
 
     def load_images(self):
 
