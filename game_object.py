@@ -37,6 +37,9 @@ class game_object:
         self.player_choices = []
         self.pending_choice = None
 
+        self.supervilains = cards.card_deck()
+        self.current_supervilain = None
+
     def buy_card(self, card):
         current = self.get_current_player()
         if card in self.lineups:
@@ -451,6 +454,21 @@ class game_object:
             for c in range(5):
                 c = p.deck.pop()
                 p.hand.append(c)
+
+        #supervilain preparation
+        first_sv = self.library.get_supervilain_by_name(self.library.first_supervilain)
+
+        first_sv = cards.game_card(first_sv, self.library)
+
+        for sv in self.library.supervilains:
+            if not sv == first_sv:
+                sv_card = cards.game_card(sv, self.library)
+                self.supervilains.push(sv_card)
+
+        #shuffling supervilains
+        self.supervilains.shuffle()
+        self.supervilains.push(first_sv)
+        self.current_supervilain = first_sv
 
         #line up
         for i in range(5):

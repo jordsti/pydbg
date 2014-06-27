@@ -18,6 +18,8 @@ class game_state(gui.gui_state):
         self.players_cards = []
         self.played_cards = []
         self.player_widgets = []
+        self.supervilain_widget = None
+
         self.current_player = None
 
         self.lineup_width = 106
@@ -38,6 +40,11 @@ class game_state(gui.gui_state):
         self.game.pick_superhero()
 
         self.game.create_cards()
+
+        self.supervilain_widget = card_widget(self, self.game.current_supervilain, 106, 150)
+        self.supervilain_widget.zoom_width = 424
+        self.supervilain_widget.zoom_height = 600
+        self.add(self.supervilain_widget)
 
         current_y = 0
 
@@ -70,6 +77,9 @@ class game_state(gui.gui_state):
         self.buyable_power_stack.y = l_start_y
         self.buyable_power_stack.zoom_width = 424
         self.buyable_power_stack.zoom_height = 600
+
+        self.supervilain_widget.x = l_start_x - 121
+        self.supervilain_widget.y = l_start_y + self.buyable_power_stack.height + 10
 
         row = 0
 

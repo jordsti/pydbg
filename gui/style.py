@@ -42,7 +42,7 @@ def load_style(style_path):
         rgb = data[1].replace('[', '')
         rgb = rgb.replace(']', '')
         rgb = rgb.split(',')
-        
+
         color = int(rgb[0]), int(rgb[1]), int(rgb[2])
         if data[0] == 'foreground':
             loaded_style.foreground_color = color
