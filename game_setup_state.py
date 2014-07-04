@@ -48,7 +48,7 @@ class game_setup_state(gui.gui_state):
 
         self.tb_players = []
         self.lbl_players = []
-        self.cb_player_superhero = []
+        self.slider_player_superhero = []
         for i in range(5):
             tb = gui.textbox(180, 22)
             self.tb_players.append(tb)
@@ -59,14 +59,14 @@ class game_setup_state(gui.gui_state):
             self.add(lbl)
             #todo
             #slider would be a better choice for this
-            cb = gui.combobox(100, 22)
-            cb.dropdown_height = 190
+            slider = gui.slider(100, 22)
+            #cb.dropdown_height = 190
             for s in self.library.superheroes:
-                cb.items.append(s.name)
+                slider.items.append(s.name)
 
-            self.cb_player_superhero.append(cb)
+            self.slider_player_superhero.append(slider)
 
-            self.add(cb)
+            self.add(slider)
 
         self.btn_start = gui.button(180, 40)
         self.btn_start.caption = "Start !"
@@ -132,7 +132,7 @@ class game_setup_state(gui.gui_state):
             self.tb_players[i].x = 75
             self.tb_players[i].y = current_y
 
-            self.cb_player_superhero[i].x = 265
-            self.cb_player_superhero[i].y = current_y
+            self.slider_player_superhero[i].x = 265
+            self.slider_player_superhero[i].y = current_y
 
             current_y += 30

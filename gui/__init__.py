@@ -10,5 +10,6 @@ from font import *
 from combobox import combobox
 from textbox import textbox
 from checkbox import checkbox
+from slider import slider
 from point import point
 from style import *
