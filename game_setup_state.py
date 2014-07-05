@@ -2,6 +2,7 @@ __author__ = 'JordSti'
 import gui
 import cards
 
+
 class game_setup_state(gui.gui_state):
     # need todo
     # combobox to pick superhero

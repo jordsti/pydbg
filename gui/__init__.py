@@ -11,5 +11,6 @@ from combobox import combobox
 from textbox import textbox
 from checkbox import checkbox
 from slider import slider
+from dialogbox import dialogbox
 from point import point
 from style import *

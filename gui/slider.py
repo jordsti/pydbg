@@ -93,4 +93,12 @@ class slider(widget.widget):
 
         buffer.blit(self.right_arrow, rect)
 
+        #border drawing
+        rect.x = 0
+        rect.y = 0
+        rect.width = self.width
+        rect.height = self.height
+
+        pygame.draw.rect(buffer, self.foreground_color, rect, 1)
+
         return buffer
