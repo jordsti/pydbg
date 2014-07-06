@@ -53,11 +53,15 @@ class slider(widget.widget):
         if self.selection_changed is not None:
             self.selection_changed(self, self.get_current_item())
 
-    def get_current_item(self):
+    def get_item(self):
         if self.selected_index < len(self.items):
             return self.items[self.selected_index]
         else:
             return None
+
+    def get_current_item(self):
+        print "WHERE'S THIS CALL!!?!"
+        return self.get_item()
 
     def render(self):
         buffer = pygame.Surface((self.width, self.height))
