@@ -131,6 +131,11 @@ class game_setup_state(gui.gui_state):
         names = []
         for i in range(nb_players):
             pname = self.tb_players[i].text
+
+            if len(pname) == 0:
+                gui.dialogbox(self, "Player name error", "Empty player name are not allowed")
+                return False
+
             if not pname in names:
                 names.append(pname)
             else:

@@ -12,12 +12,7 @@ class deck_view(gui.gui_state):
         gui.gui_state.__init__(self)
 
         if library is None:
-            files = os.listdir("deck")
-            for f in files:
-                path = os.path.join("deck", f)
-                if os.path.isdir(path):
-                    library = cards.library(path)
-                    break
+            library = cards.library("../dc-deck/pack1")
 
         self.library = library
         self.handle_quit = False

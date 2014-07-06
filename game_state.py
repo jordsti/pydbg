@@ -150,6 +150,10 @@ class game_state(gui.gui_state):
         self.btn_end_turn.caption = "End turn"
         self.btn_end_turn.add_receivers(self.end_turn)
 
+        self.ta_actions = gui.textarea(260, 80)
+        self.ta_actions.text = "Starting game"
+        self.add(self.ta_actions)
+
         self.game.change_turn = self.player_turn
         self.game.card_played = self.played_card
         self.game.lineup_changed = self.apply_lineup_action
@@ -190,10 +194,12 @@ class game_state(gui.gui_state):
         self.add(w)
         self.players_cards.append(w)
 
-
     def buy_card(self, widget, card):
         if card in self.game.buyable_powers:
             rs = self.game.buy_card(card)
+
+            if rs:
+                self.ta_actions.append("Card bought : " + card.name)
 
             if rs and len(self.game.buyable_powers) > 0:
                 self.buyable_power_stack.card = self.game.buyable_powers[0]
@@ -201,7 +207,8 @@ class game_state(gui.gui_state):
                 self.elements.remove(self.buyable_power_stack)
 
         else:
-            self.game.buy_card(card)
+            if self.game.buy_card(card):
+                self.ta_actions.append("Card bought : " + card.name)
 
     def played_card(self, player, card):
         widget = card_widget(self, card, self.play_width, self.play_height)
@@ -284,7 +291,7 @@ class game_state(gui.gui_state):
             self.buyable_power_stack.activated = self.buy_card
 
     def player_turn(self, player):
-        print "turn-> " + player.name
+        self.ta_actions.append("Player turn : " + player.name)
         self.lbl_current_turn.text = "%s's turn !" % player.name
         self.current_player = player
         #card view
@@ -319,6 +326,9 @@ class game_state(gui.gui_state):
     def init(self):
         for w in self.player_widgets:
             w.x = self.width - w.width
+
+        self.ta_actions.x = self.width - self.ta_actions.width
+        self.ta_actions.y = self.height - self.ta_actions.height
 
     def on_event(self, event):
         if self.choice_overlay is not None:

@@ -522,7 +522,6 @@ class game_object:
                 max = v
                 winner = self.get_player(k)
 
-
         index = self.get_player_index(winner)
 
         self.starting_player = index

@@ -12,5 +12,6 @@ from textbox import textbox
 from checkbox import checkbox
 from slider import slider
 from dialogbox import dialogbox
+from textarea import textarea
 from point import point
 from style import *

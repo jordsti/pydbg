@@ -14,7 +14,11 @@ You need to download the deck graphics and card data separately.
 TO DO
 ======
 -Supervilain stack is not buyable at the moment
+
 -Need to work on card choice ability like may destroy a card or discard a card
+
 -First Appereance ability for supervilain
+
 -Location, OnGoing card.
+
 -Many other things that don't come to my mind at the moment...
