@@ -70,8 +70,12 @@ class gui_state(base_state):
                 for e in self.elements:
                     if e.x <= event.pos[0] and e.x + e.width >= event.pos[0] and e.y <= event.pos[1] and e.y + e.height >= event.pos[1]:
                         e.is_hover(True)
+                        e.on_mouse_over(event.pos[0] - e.x, event.pos[1] - e.y)
                     else:
                         e.is_hover(False)
+            else:
+                self.__dialog.on_mouse_over(event.pos[0] - self.__dialog.x, event.pos[1] - self.__dialog.y)
+
         if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
             if self.__dialog is None:
                 for e in self.elements:

@@ -66,7 +66,6 @@ class library:
 
                 self.supervilains.append(sv)
 
-
     def get_starter(self):
 
         cards = []
@@ -84,6 +83,14 @@ class library:
         for sv in self.supervilains:
             if sv.name == name:
                 return sv
+
+        return None
+
+    def get_superhero_by_name(self, name):
+
+        for sh in self.superheroes:
+            if sh.name == name:
+                return sh
 
         return None
 

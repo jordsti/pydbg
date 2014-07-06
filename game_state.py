@@ -10,15 +10,18 @@ import pygame
 
 
 class game_state(gui.gui_state):
+    (RandomPick, ChosenPick) = (0, 1)
 
-    def __init__(self, players):
+    def __init__(self, players, superhero_pick=RandomPick, players_pick={}):
         gui.gui_state.__init__(self)
-        self.library = cards.library("../dc-deck/pack1")
+        self.library = cards.library("../dc-deck/pack1")  # todo need to find a more elegant way, not to hardcode this!
         self.game = game_object(self.library)
         self.players_cards = []
         self.played_cards = []
         self.player_widgets = []
         self.supervilain_widget = None
+        self.superhero_pick = superhero_pick
+        self.players_pick = players_pick
 
         self.current_player = None
 
@@ -37,7 +40,12 @@ class game_state(gui.gui_state):
         self.card_zoomed = False
         self.zoomed_widget = None
 
-        self.game.pick_superhero()
+        self.game.roll_players_start()
+
+        if self.superhero_pick == self.RandomPick:
+            self.game.pick_superhero()
+        elif self.superhero_pick == self.ChosenPick:
+            self.game.assign_superhero(players_pick)
 
         self.game.create_cards()
 

@@ -69,11 +69,9 @@ class game_setup_state(gui.gui_state):
                 tb.visible = False
                 lbl.visible = False
 
-            #todo
-            #slider would be a better choice for this
             slider = gui.slider(100, 22)
             slider.visible = False
-            #cb.dropdown_height = 190
+
             for s in self.library.superheroes:
                 slider.items.append(s.name)
 
@@ -126,10 +124,18 @@ class game_setup_state(gui.gui_state):
                 if p_superhero in superheroes:
                     superheroes.remove(p_superhero)
                 else:
-                    dialog = gui.dialogbox(self)
-                    dialog.caption = "A Superhero can only by pick by one player"
-                    dialog.title = "Game error"
+                    gui.dialogbox(self, "Game error", "A Superhero can only by pick by one player")
                     return False
+
+        #unique player name
+        names = []
+        for i in range(nb_players):
+            pname = self.tb_players[i].text
+            if not pname in names:
+                names.append(pname)
+            else:
+                gui.dialogbox(self, "Player name error", "Each player must have a unique name")
+                return False
 
         return True
 
@@ -143,8 +149,18 @@ class game_setup_state(gui.gui_state):
                 names.append(pn)
 
             from game_state import game_state
-            state = game_state(names)
-            self.viewport.push(state)
+
+            if self.cb_superhero_pick.checked:
+                state = game_state(names)
+                self.viewport.push(state)
+            else:
+                picks = {}
+                for i in range(player_num):
+                    picks[names[i]] = self.slider_player_superhero[i].get_item()
+
+                state = game_state(names, game_state.ChosenPick, picks)
+                self.viewport.push(state)
+
 
     def back(self, src):
         from main_menu import main_menu

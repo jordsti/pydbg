@@ -197,7 +197,9 @@ class game_object:
 
     def complete_choice(self, choice):
         #todo
-
+        print "Selected Card(s) :"
+        for c in choice.selected_cards:
+            print c.name
         pass
 
     def end_turn_abilities(self):
@@ -504,8 +506,7 @@ class game_object:
 
         return None
 
-    def pick_superhero(self):
-
+    def roll_players_start(self):
         players_roll = {}
 
         for p in self.players:
@@ -527,6 +528,15 @@ class game_object:
         self.starting_player = index
         self.current_player = index
 
+    def assign_superhero(self, players_pick):
+        for k in players_pick:
+            p = self.get_player(k)
+            sh = self.library.get_superhero_by_name(players_pick[k])
+            p.superhero = sh
+
+    def pick_superhero(self):
+
+        index = self.starting_player
         for i in range(len(self.players)):
             p_i = (index + i) % len(self.players)
 
@@ -539,3 +549,5 @@ class game_object:
             player.superhero = superhero
 
             self.library.superheroes.remove(superhero)
+
+        #todo add game_start abilites, for FLASH!

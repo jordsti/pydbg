@@ -11,7 +11,7 @@ class dialogbox(widget):
     (Ok, OkCancel) = (1, 2)
     (ButtonOk, ButtonCancel) = (1, 2)
 
-    def __init__(self, parent, buttons=Ok, width=0, height=0, auto_spawn=True):
+    def __init__(self, parent, title="", caption="", buttons=Ok, width=0, height=0, auto_spawn=True):
         widget.__init__(self, 'dialogbox', width, height)
 
         self.auto_spawn = auto_spawn
@@ -34,8 +34,8 @@ class dialogbox(widget):
             self.width = self.DefaultWidth
             self.height = self.DefaultHeight
 
-        self.caption = "Is this ok !?!"
-        self.title = "Default Dialog"
+        self.caption = caption
+        self.title = title
 
         self.dialog_action = None
         self.__generate_buttons()
@@ -57,6 +57,7 @@ class dialogbox(widget):
             btn_ok.x = (self.width - self.button_width) / 2
             btn_ok.y = (self.height - self.button_height) - self.button_offset
             self.__buttons.append(btn_ok)
+
         elif self.buttons == self.OkCancel:
             btn_ok = button(self.button_width, self.button_height)
             btn_ok.caption = "Ok"
@@ -78,6 +79,13 @@ class dialogbox(widget):
                 rel_x = rel_x - btn.x
                 rel_y = rel_y - btn.y
                 btn.on_click(button, rel_x, rel_y)
+
+    def on_mouse_over(self, rel_x, rel_y):
+        for btn in self.__buttons:
+            if btn.contains(rel_x, rel_y):
+                btn.hover = True
+            else:
+                btn.hover = False
 
     def __ok(self, src):
         self.parent.remove_dialog()
