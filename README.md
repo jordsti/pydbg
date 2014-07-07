@@ -12,7 +12,7 @@ Just launch main.py to launch the game Main Menu and Start a Game.
 You need to download the deck graphics and card data separately.
 
 TO DO
-======
+=====
 -Supervilain stack is not buyable at the moment
 
 -Need to work on card choice ability like may destroy a card or discard a card
@@ -20,5 +20,7 @@ TO DO
 -First Appereance ability for supervilain
 
 -Location, OnGoing card.
+
+-Card selector is a bit ugly atm
 
 -Many other things that don't come to my mind at the moment...
