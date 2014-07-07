@@ -13,8 +13,9 @@ class lineup_action:
 
 
 class game_object:
-
+    (GameInit, PlayerTurn, EndTurnChoice) = (0, 1, 2)
     def __init__(self, library):
+        self.current_state = self.GameInit
         self.players = []
         self.player_count = 0
         self.library = library
@@ -33,12 +34,17 @@ class game_object:
         self.lineup_changed = None
         self.drawn_card = None
         self.ask_player = None
+        self.game_text = None
 
         self.player_choices = []
         self.pending_choice = None
 
         self.supervilains = cards.card_deck()
         self.current_supervilain = None
+
+    def game_message(self, text):
+        if self.game_text is not None:
+            self.game_text(text)
 
     def buy_card(self, card):
         current = self.get_current_player()
@@ -66,14 +72,17 @@ class game_object:
         return False
 
     def end_turn_phase(self):
-        #for wonderwoman specially
-        #need to split between end_turn_phase, todo like aquaman's trident and other...
-        self.end_turn_abilities()
-        self.apply_superhero_bonus()
+        if self.current_state == self.PlayerTurn:
+            #for wonderwoman specially
+            #need to split between end_turn_phase, todo like aquaman's trident and other...
+            self.end_turn_abilities()
+            self.apply_superhero_bonus()
+            self.current_state = self.EndTurnChoice
 
         if self.pending_choice is None:
             #no choice to take !
             self.end_turn()
+            self.current_state = self.PlayerTurn
 
     def end_turn(self):
 
@@ -197,10 +206,33 @@ class game_object:
 
     def complete_choice(self, choice):
         #todo
-        print "Selected Card(s) :"
-        for c in choice.selected_cards:
-            print c.name
-        pass
+        if not choice.completed:
+            for c in choice.selected_cards:
+                if choice.destination == player.player_choice.DestroyCard:
+                    #todo
+                    #way to handle destroyed, new list ?
+                    pass
+                elif choice.destination == player.player_choice.PlayerDeckTop:
+                    #aquaman testing
+                    choice.player.deck.push(c)
+                    self.game_message(c.name + " -> Player Deck Top")
+                    #removing card from gained_cards
+                    if c in choice.player.gained_cards:
+                        choice.player.gained_cards.remove(c)
+                elif choice.destination == player.player_choice.PlayerDeckBottom:
+                    #todo
+                    pass
+                elif choice.destination == player.player_choice.DiscardCard:
+                    choice.player.discard_pile.append(c)
+                    if c in choice.player.hand:
+                        choice.player.hand.remove(c)
+                    self.game_message(c.name + " discarded")
+            choice.completed = True
+            self.pending_choice = None
+            print "Choice completed"
+        else:
+            print "Choice already completed !"
+
 
     def end_turn_abilities(self):
         current = self.get_current_player()
@@ -239,7 +271,7 @@ class game_object:
                                 if a.action.destination == cards.card_action.PlayerDeckTop:
                                     dest = player.player_choice.PlayerDeckTop
 
-                                choice = player.player_choice(selected_cards, dest, a.action.count, not a.action.forced)
+                                choice = player.player_choice(selected_cards, current, dest, a.action.count, not a.action.forced)
                                 self.player_choices.append(choice)
 
                                 if self.pending_choice is None:
@@ -354,6 +386,7 @@ class game_object:
                     print "Bonus from %s, %d, %d" % (card.name, a.bonus.type, a.bonus.nb)
                     if a.bonus.type == cards.bonus.Power:
                         player.total_power += a.bonus.nb
+                        self.game_message("Bonus from %s : +%d Power" % (card.name, a.bonus.nb))
                     elif a.bonus.type == cards.bonus.DrawCard:
                         for i in range(a.bonus.nb):
                             c = self.draw_player_card(player)
@@ -361,6 +394,7 @@ class game_object:
 
                             if self.drawn_card is not None:
                                 self.drawn_card(player, c)
+                        self.game_message("Bonus from %s : Draw %d card(s)" % (card.name, a.bonus.nb))
             else:
                 condition_ok = False
                 bonuses = []
@@ -381,6 +415,7 @@ class game_object:
                                     bonuses.append(a.bonus)
                     elif c.cond == cards.condition.EmptyDiscardPile:
                         #mera case
+                        #todo seems like not working.. hmm
                         if len(player.discard_pile) == 0:
                             condition_ok = True
                             bonuses.append(a.bonus)
@@ -390,6 +425,7 @@ class game_object:
                             if c.where == cards.condition.DeckTopCard:
                                 #power ring
                                 card = player.deck.reveal()
+                                self.game_message("Card reveal : %s , Cost : %d" % (card.name, card.cost))
                                 if card.cost >= int(c.value):
                                     bonuses.append(a.bonus)
                                     condition_ok = True
@@ -399,10 +435,12 @@ class game_object:
                         print "Bonus from %s, %d, %d" % (card.name, b.type, b.nb)
                         if b.type == cards.bonus.Power:
                             player.total_power += b.nb
+                            self.game_message("Bonus from %s : +%d Power" % (card.name, b.nb))
                         elif b.type == cards.bonus.DrawCard:
                             for i in range(b.nb):
                                 c = self.draw_player_card(player)
                                 player.hand.append(c)
+                            self.game_message("Bonus from %s : Draw %d card(s)" % (card.name, b.nb))
 
     def draw_player_card(self, player):
         if player.deck.empty():
@@ -477,6 +515,7 @@ class game_object:
             self.lineups.append(self.main_deck.pop())
 
     def start_game(self):
+        self.current_state = self.PlayerTurn
         self.turns += 1
         if self.change_turn is not None:
             player = self.get_current_player()

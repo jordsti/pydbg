@@ -150,16 +150,18 @@ class game_state(gui.gui_state):
         self.btn_end_turn.caption = "End turn"
         self.btn_end_turn.add_receivers(self.end_turn)
 
-        self.ta_actions = gui.textarea(260, 80)
+        self.ta_actions = gui.textarea(400, 100)
         self.ta_actions.text = "Starting game"
         self.add(self.ta_actions)
 
+        #actions bindings
         self.game.change_turn = self.player_turn
         self.game.card_played = self.played_card
         self.game.lineup_changed = self.apply_lineup_action
         self.buyable_power_stack.activated = self.buy_card
         self.game.drawn_card = self.drawn_card
         self.game.ask_player = self.ask_player
+        self.game.game_text = self.ta_actions.append
         self.game.start_game()
 
     def ask_player(self, player, choice):
@@ -250,9 +252,8 @@ class game_state(gui.gui_state):
         #completing choice
         #need to check if the choice is may or forced and respecting card count
         #todo
-        selected_cards = self.choice_overlay.selected_cards
+        #selected_cards = self.choice_overlay.selected_cards
         self.game.complete_choice(self.choice_overlay.choice)
-
         self.choice_overlay = None
 
     def quit_game(self, src):

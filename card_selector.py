@@ -77,14 +77,14 @@ class card_selector(gui.widget):
         if not self.choice.may:
             if len(self.selected_cards) == self.choice.count:
                 self.apply_choice()
-                if self.choice_done is not None:
-                    self.choice_done(self.choice)  # todo some testing
+                if self.closing is not None:
+                    self.closing(self)
             else:
                 print "You must choose %d cards !" % self.choice.count
         else:
-            if self.choice_done is not None:
-                self.apply_choice()
-                self.choice_done(self.choice)  # todo some testing
+            self.apply_choice()
+            if self.closing is not None:
+                self.closing(self)
 
     def load_images(self):
 

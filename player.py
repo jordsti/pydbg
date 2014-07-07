@@ -53,9 +53,11 @@ class player:
 class player_choice:
     (DiscardCard, DestroyCard, PlayerDeckTop, PlayerDeckBottom) = (0, 1, 2, 3)
 
-    def __init__(self, cards, destination=DiscardCard, count=1, may=False):
+    def __init__(self, cards, player, destination=DiscardCard, count=1, may=False):
         self.may = may
+        self.player = player
         self.cards = cards
         self.selected_cards = []
         self.count = count
         self.destination = destination
+        self.completed = False
