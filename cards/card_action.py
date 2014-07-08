@@ -3,8 +3,8 @@ from card_constraint import card_constraint
 
 
 class card_action:
-    (ChooseCard) = 0
-    (GainedCard, LineUp, MainDeckTop, PlayerDeckTop, DiscardPile) = (0, 1, 2, 3, 4)
+    (ChooseCard, MayDestroyCard) = (0, 1)
+    (GainedCard, LineUp, MainDeckTop, PlayerDeckTop, DiscardPile, DestroyedCard) = (0, 1, 2, 3, 4)
     (Infinite) = -1
 
     def __init__(self, type=ChooseCard, source=PlayerDeckTop, destination=DiscardPile, count=Infinite, forced=False, constraints=[]):
@@ -24,6 +24,8 @@ class card_action:
         if nb_vars >= 1:
             if vars[0] == 'ChooseCard':
                 self.type = self.ChooseCard
+            elif vars[0] == 'MayDestroyCard':
+                self.type = self.MayDestroyCard
 
         if nb_vars >= 2:
             self.source = self.parse_loc(vars[1])
@@ -61,7 +63,6 @@ class card_action:
 
         return True
 
-
     def parse_loc(self, loc):
         #(GainedCard, LineUp, MainDeckTop, PlayerDeckTop, DiscardPile) = (0, 1, 2, 3, 4)
         if loc == 'GainedCard':
@@ -74,6 +75,8 @@ class card_action:
             return self.PlayerDeckTop
         elif loc == 'DiscardPile':
             return self.DiscardPile
+        elif loc == 'DestroyedCard':
+            return self.DestroyedCard
         else:
             raise Exception("Parsing Error; ability.py")
 

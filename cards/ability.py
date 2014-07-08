@@ -39,7 +39,7 @@ def get_bonus_type(text):
 
 
 class condition:
-    (MinCard, ForEach, MinCost, EmptyDiscardPile, FirstPlayed, ForEachDifferentName) = (0, 1, 2, 3, 4, 5)
+    (MinCard, ForEach, MinCost, EmptyDiscardPile, FirstPlayed, ForEachDifferentName, ActionCompleted) = (0, 1, 2, 3, 4, 5)
     (CardType, CardName, CardCost, CardAbility, CardDifferentNameCount) = (0, 1, 2, 3, 4)
     (DiscardPile, PlayedCard, LineUp, DeckTopCard, GainedCard) = (0, 1, 2, 3, 4)
 
@@ -75,6 +75,8 @@ class condition:
                 self.cond = self.FirstPlayed
             elif cond == 'ForEachDifferentName':
                 self.cond = self.ForEachDifferentName
+            elif cond == 'ActionCompleted':
+                self.cond = self.ActionCompleted
         if nb_vars >= 2:
             #test var
             test = data[1].rstrip(':')
@@ -121,11 +123,11 @@ class ability:
 
     def __init__(self, type=Passive):
         self.type = type
-        self.conditions = []  # need to rework this
+        self.conditions = []  # todo need to rework this
         self.condition = None
         self.pre_conditions = []
         self.bonus = None
-        self.bonuses = [] # need rework on this too
+        self.bonuses = [] # todo need rework on this too
         self.action = None
 
     def from_string(self, text):

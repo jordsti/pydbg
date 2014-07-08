@@ -419,14 +419,16 @@ class game_object:
                         if len(player.discard_pile) == 0:
                             condition_ok = True
                             bonuses.append(a.bonus)
+                    elif c.cond == cards.condition.ActionCompleted:
+                        pass #todo
 
                     elif c.cond == cards.condition.MinCost:
                         if c.test == cards.condition.CardCost:
                             if c.where == cards.condition.DeckTopCard:
                                 #power ring
-                                card = player.deck.reveal()
-                                self.game_message("Card reveal : %s , Cost : %d" % (card.name, card.cost))
-                                if card.cost >= int(c.value):
+                                revealed_card = player.deck.reveal()
+                                self.game_message("[%s] Deck Top Card reveal : %s , Cost : %d" % (card.name, revealed_card.name, revealed_card.cost))
+                                if revealed_card.cost >= int(c.value):
                                     bonuses.append(a.bonus)
                                     condition_ok = True
 
