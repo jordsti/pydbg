@@ -24,3 +24,21 @@ TO DO
 -Card selector is a bit ugly atm
 
 -Many other things that don't come to my mind at the moment...
+
+BUGS
+===
+
+Cards not working or need to be tested
+==
+
+- Power ring
+
+- Heat vision
+
+- Green latern bonus need to only apply once
+
+- Mera
+
+- The Penguin
+
+- many more...
