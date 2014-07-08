@@ -39,7 +39,7 @@ def get_bonus_type(text):
 
 
 class condition:
-    (MinCard, ForEach, MinCost, EmptyDiscardPile, FirstPlayed, ForEachDifferentName, ActionCompleted) = (0, 1, 2, 3, 4, 5)
+    (MinCard, ForEach, MinCost, EmptyDiscardPile, FirstPlayed, ForEachDifferentName, ActionCompleted) = (0, 1, 2, 3, 4, 5, 6)
     (CardType, CardName, CardCost, CardAbility, CardDifferentNameCount) = (0, 1, 2, 3, 4)
     (DiscardPile, PlayedCard, LineUp, DeckTopCard, GainedCard) = (0, 1, 2, 3, 4)
 
@@ -59,7 +59,6 @@ class condition:
     def from_string(self, text):
         data = text.split(':')
         nb_vars = len(data)
-
         if nb_vars >= 1:
             #condition
             cond = data[0].rstrip(':')
@@ -69,14 +68,15 @@ class condition:
                 self.cond = self.ForEach
             elif cond == 'MinCost':
                 self.cond = self.MinCost
-            elif cond == 'EmtyDiscardPile':
-                self.cond == self.EmptyDiscardPile
+            elif cond == 'EmptyDiscardPile':
+                self.cond = self.EmptyDiscardPile
             elif cond == 'FirstPlayed':
                 self.cond = self.FirstPlayed
             elif cond == 'ForEachDifferentName':
                 self.cond = self.ForEachDifferentName
             elif cond == 'ActionCompleted':
                 self.cond = self.ActionCompleted
+
         if nb_vars >= 2:
             #test var
             test = data[1].rstrip(':')
@@ -89,6 +89,8 @@ class condition:
                 self.test = self.CardAbility
             elif test == 'CardDifferentNameCount':
                 self.test = self.CardDifferentNameCount
+            elif test == 'CardCost':
+                self.test = self.CardCost
 
         if nb_vars >= 3:
             #where
@@ -111,7 +113,6 @@ class condition:
                 self.value = data[3].split('|')
             else:
                 self.value = [data[3]]
-
 
         if nb_vars >= 5:
             #count
@@ -156,7 +157,6 @@ class ability:
                 cond = d[10:]
                 c = condition()
                 c.from_string(cond)
-
                 self.conditions.append(c)
 
                 self.condition = c

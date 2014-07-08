@@ -42,6 +42,8 @@ class game_object:
         self.supervilains = cards.card_deck()
         self.current_supervilain = None
 
+        self.destroyed_cards = []
+
     def game_message(self, text):
         if self.game_text is not None:
             self.game_text(text)
@@ -51,7 +53,7 @@ class game_object:
         if card in self.lineups:
             if card.cost <= current.total_power:
                 current.total_power -= card.cost
-                print "buying card from field"
+                #print "buying card from field"
                 self.lineups.remove(card)
                 current.gained_cards.append(card)
 
@@ -157,7 +159,7 @@ class game_object:
 
         if self.current_player == self.starting_player:
             self.turns += 1
-            print "Turn complete %d " % self.turns
+            self.game_message("Turn completed [%d]" % self.turns)
         if self.change_turn is not None:
             self.change_turn(current)
 
@@ -185,23 +187,27 @@ class game_object:
             print "Error 1"
 
     def apply_superhero_bonus(self):
-        player = self.get_current_player()
-        for bonus in player.superhero_bonuses:
-
+        cur_player = self.get_current_player()
+        for bonus in cur_player.superhero_bonuses:
+            #todo bug seems like green latern bonus applied for each played card after the condition is meet
             if not bonus.applied:
                 if bonus.bonus.type == cards.bonus.Power:
-                    player.total_power += bonus.bonus.nb
+                    cur_player.total_power += bonus.bonus.nb
+                    self.game_message("Bonus from %s : +%d Power" % (cur_player.superhero.name, bonus.bonus.nb))
                 elif bonus.bonus.type == cards.bonus.DrawCard:
                     for i in range(bonus.bonus.nb):
-                        c = self.draw_player_card(player)
-                        player.hand.append(c)
+                        c = self.draw_player_card(cur_player)
+                        cur_player.hand.append(c)
 
                         if self.drawn_card is not None:
-                            self.drawn_card(player, c)
-                elif bonus.bonus.type == cards.bonus.NextHandCard:
-                    player.next_hand_size += bonus.bonus.nb
+                            self.drawn_card(cur_player, c)
 
-                print "Bonus from %s, %d, %d" % (player.superhero.name, bonus.bonus.type, bonus.bonus.nb)
+                        self.game_message("Bonus from %s : Draw %d card(s)" % (cur_player.superhero.name, bonus.bonus.nb))
+
+                elif bonus.bonus.type == cards.bonus.NextHandCard:
+                    cur_player.next_hand_size += bonus.bonus.nb
+                    self.game_message("Bonus from %s : +%d card(s) for next hand" % (cur_player.superhero.name, bonus.bonus.nb))
+
                 bonus.applied = True
 
     def complete_choice(self, choice):
@@ -211,7 +217,14 @@ class game_object:
                 if choice.destination == player.player_choice.DestroyCard:
                     #todo
                     #way to handle destroyed, new list ?
-                    pass
+                    if c in choice.player.hand:
+                        choice.player.hand.remove(c)
+                    elif c in choice.player.discard_pile:
+                        choice.player.discard_pile.remove(c)
+
+                    self.destroyed_cards.append(c)
+                    self.game_message("Card %s destroyed by %s" % (c.name, choice.player.name))
+
                 elif choice.destination == player.player_choice.PlayerDeckTop:
                     #aquaman testing
                     choice.player.deck.push(c)
@@ -220,7 +233,7 @@ class game_object:
                     if c in choice.player.gained_cards:
                         choice.player.gained_cards.remove(c)
                 elif choice.destination == player.player_choice.PlayerDeckBottom:
-                    #todo
+                    #todo zatana case
                     pass
                 elif choice.destination == player.player_choice.DiscardCard:
                     choice.player.discard_pile.append(c)
@@ -229,6 +242,17 @@ class game_object:
                     self.game_message(c.name + " discarded")
             choice.completed = True
             self.pending_choice = None
+            self.player_choices.remove(choice)
+            # todo other player choices waiting..
+
+            if choice.bonus is not None:
+                if len(choice.selected_cards) == choice.count:
+                    # todo some testing for this case
+                    # applying bonus
+                    if choice.bonus.type == cards.bonus.Power:
+                        choice.player.total_power += choice.bonus.nb
+                        self.game_message("Bonus from completed action : +%d Power" % choice.bonus.nb)
+
             print "Choice completed"
         else:
             print "Choice already completed !"
@@ -272,15 +296,17 @@ class game_object:
                                     dest = player.player_choice.PlayerDeckTop
 
                                 choice = player.player_choice(selected_cards, current, dest, a.action.count, not a.action.forced)
-                                self.player_choices.append(choice)
+                                self.propose_player_choice(choice)
+        # todo card abilities
 
-                                if self.pending_choice is None:
-                                    self.pending_choice = choice
-                                    if self.ask_player is not None:
-                                        self.ask_player(player, choice)
+    def propose_player_choice(self, choice):
+        cur_player = self.get_current_player()
+        self.player_choices.append(choice)
 
-        #card abilities
-        #todo
+        if self.pending_choice is None:
+            self.pending_choice = choice
+            if self.ask_player is not None:
+                self.ask_player(cur_player, choice)
 
     def superhero_ability_check(self, played_card):
         #starting with martian manhunter case
@@ -376,25 +402,58 @@ class game_object:
                                 if sb not in player.superhero_bonuses:
                                     player.superhero_bonuses.append(sb)
 
-
     def apply_card(self, card):
-        player = self.get_current_player()
+        cur_player = self.get_current_player()
 
         for a in card.abilities:
-            if a.condition is None:
+            if a.condition is None and a.bonus is not None:
                 if a.type == cards.ability.Passive:
                     print "Bonus from %s, %d, %d" % (card.name, a.bonus.type, a.bonus.nb)
                     if a.bonus.type == cards.bonus.Power:
-                        player.total_power += a.bonus.nb
+                        cur_player.total_power += a.bonus.nb
                         self.game_message("Bonus from %s : +%d Power" % (card.name, a.bonus.nb))
                     elif a.bonus.type == cards.bonus.DrawCard:
                         for i in range(a.bonus.nb):
-                            c = self.draw_player_card(player)
-                            player.hand.append(c)
+                            c = self.draw_player_card(cur_player)
+                            cur_player.hand.append(c)
 
                             if self.drawn_card is not None:
-                                self.drawn_card(player, c)
+                                self.drawn_card(cur_player, c)
                         self.game_message("Bonus from %s : Draw %d card(s)" % (card.name, a.bonus.nb))
+
+            elif a.condition is None and a.bonus is None:
+                #the penguin discard action
+                if a.action is not None:
+                    if a.action.type == cards.card_action.ChooseCard:
+                        print "choose card"
+                        print "heat vision case"
+                        cards_choice = []
+                        if a.action.source == cards.card_action.Hand:
+                            for pcard in cur_player.hand:
+                                if a.action.respect_constraint(pcard):
+                                    cards_choice.append(pcard)
+                        elif a.action.source == cards.card_action.DiscardPile:
+                            for pcard in cur_player.discard_pile:
+                                if a.action.respect_constraint(pcard):
+                                    cards_choice.append(pcard)
+                        elif a.action.source == cards.card_action.HandAndDiscardPile:
+                            for pcard in cur_player.hand:
+                                if a.action.respect_constraint(pcard):
+                                    cards_choice.append(pcard)
+                            for pcard in cur_player.discard_pile:
+                                if a.action.respect_constraint(pcard):
+                                    cards_choice.append(pcard)
+
+                        dest = None
+                        if a.action.destination == cards.card_action.DestroyedCard:
+                            dest = player.player_choice.DestroyCard
+                        elif a.action.destination == cards.card_action.DiscardPile:
+                            dest = player.player_choice.DiscardCard
+                        # elif
+                        # todo other card case
+                        if len(cards_choice) > 0 and dest is not None:
+                            choice = player.player_choice(cards_choice, cur_player, dest, a.action.count, not a.action.forced, a.bonus)
+                            self.propose_player_choice(choice)
             else:
                 condition_ok = False
                 bonuses = []
@@ -405,7 +464,7 @@ class game_object:
                             if c.where == cards.condition.PlayedCard:
                                 #high tech hero case
                                 count = 0
-                                for pcard in player.played_cards:
+                                for pcard in cur_player.played_cards:
                                     if pcard.card_type in c.value:
                                         count += 1
 
@@ -416,19 +475,58 @@ class game_object:
                     elif c.cond == cards.condition.EmptyDiscardPile:
                         #mera case
                         #todo seems like not working.. hmm
-                        if len(player.discard_pile) == 0:
+                        print "debug: mera"
+                        if len(cur_player.discard_pile) == 0:
                             condition_ok = True
                             bonuses.append(a.bonus)
                     elif c.cond == cards.condition.ActionCompleted:
-                        pass #todo
+                        if a.action is not None:
+                            if a.action.type == cards.card_action.MayDestroyCard:
+                                cards_choice = []
+                                dest = None
+                                # todo king of atlantis test
+                                if a.action.source == cards.card_action.DiscardPile:
+                                    for pcard in cur_player.discard_pile:
+                                        if a.action.respect_constraint(pcard):
+                                            cards_choice.append(pcard)
+                                elif a.action.source == cards.card_action.Hand:
+                                    # penguin and other discard card
+                                    # todo some testing
+                                    for pcard in cur_player.hand:
+                                        if a.action.respect_constraint(pcard):
+                                            cards_choice.append(pcard)
+                                elif a.action.source == cards.card_action.HandAndDiscardPile:
+                                    #lobo and heat vision
+                                    #todo some testing here again..
+                                    for pcard in cur_player.hand:
+                                        if a.action.respect_constraint(pcard):
+                                            cards_choice.append(pcard)
+                                    for pcard in cur_player.discard_pile:
+                                        if a.action.respect_constraint(pcard):
+                                            cards_choice.append(pcard)
+
+                                if a.action.destination == cards.card_action.DestroyedCard:
+                                    dest = player.player_choice.DestroyCard
+                                elif a.action.destination == cards.card_action.DiscardPile:
+                                    dest = player.player_choice.DiscardCard
+                                # elif
+                                # todo other card case
+                                if len(cards_choice) > 0 and dest is not None:
+                                    choice = player.player_choice(cards_choice, cur_player, dest, a.action.count, not a.action.forced, a.bonus)
+                                    self.propose_player_choice(choice)
 
                     elif c.cond == cards.condition.MinCost:
+                        print "Power ring - 1"
+                        print "Condition :", c.cond, c.test, c.where, c.value, c.count
                         if c.test == cards.condition.CardCost:
+                            print "Power ring - 2"
                             if c.where == cards.condition.DeckTopCard:
+                                print "Power ring - 3"
                                 #power ring
-                                revealed_card = player.deck.reveal()
+                                revealed_card = cur_player.deck.reveal()
+
                                 self.game_message("[%s] Deck Top Card reveal : %s , Cost : %d" % (card.name, revealed_card.name, revealed_card.cost))
-                                if revealed_card.cost >= int(c.value):
+                                if revealed_card.cost >= int(c.count):
                                     bonuses.append(a.bonus)
                                     condition_ok = True
 
@@ -436,22 +534,22 @@ class game_object:
                     for b in bonuses:
                         print "Bonus from %s, %d, %d" % (card.name, b.type, b.nb)
                         if b.type == cards.bonus.Power:
-                            player.total_power += b.nb
+                            cur_player.total_power += b.nb
                             self.game_message("Bonus from %s : +%d Power" % (card.name, b.nb))
                         elif b.type == cards.bonus.DrawCard:
                             for i in range(b.nb):
-                                c = self.draw_player_card(player)
-                                player.hand.append(c)
+                                c = self.draw_player_card(cur_player)
+                                cur_player.hand.append(c)
                             self.game_message("Bonus from %s : Draw %d card(s)" % (card.name, b.nb))
 
-    def draw_player_card(self, player):
-        if player.deck.empty():
-            for c in player.discard_pile:
-                player.deck.push(c)
+    def draw_player_card(self, cur_player):
+        if cur_player.deck.empty():
+            for c in cur_player.discard_pile:
+                cur_player.deck.push(c)
 
-            player.deck.shuffle()
+            cur_player.deck.shuffle()
 
-        return player.deck.pop()
+        return cur_player.deck.pop()
 
     def create_cards(self):
 

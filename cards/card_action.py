@@ -4,7 +4,7 @@ from card_constraint import card_constraint
 
 class card_action:
     (ChooseCard, MayDestroyCard) = (0, 1)
-    (GainedCard, LineUp, MainDeckTop, PlayerDeckTop, DiscardPile, DestroyedCard) = (0, 1, 2, 3, 4)
+    (GainedCard, LineUp, MainDeckTop, PlayerDeckTop, DiscardPile, DestroyedCard, Hand, HandAndDiscardPile) = (0, 1, 2, 3, 4, 5, 6, 7)
     (Infinite) = -1
 
     def __init__(self, type=ChooseCard, source=PlayerDeckTop, destination=DiscardPile, count=Infinite, forced=False, constraints=[]):
@@ -77,6 +77,10 @@ class card_action:
             return self.DiscardPile
         elif loc == 'DestroyedCard':
             return self.DestroyedCard
+        elif loc == 'Hand':
+            return self.Hand
+        elif loc == 'HandAndDiscardPile':
+            return self.HandAndDiscardPile
         else:
             raise Exception("Parsing Error; ability.py")
 
