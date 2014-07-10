@@ -255,6 +255,26 @@ class game_state(gui.gui_state):
         #selected_cards = self.choice_overlay.selected_cards
         self.game.complete_choice(self.choice_overlay.choice)
         self.choice_overlay = None
+        self.refresh_player_hand()
+
+    def refresh_player_hand(self):
+
+        to_remove = []
+
+        for wc in self.players_cards:
+            if wc.card not in self.game.get_current_player().hand:
+                to_remove.append(wc)
+        for wc in to_remove:
+            self.players_cards.remove(wc)
+            self.elements.remove(wc)
+
+        for pc in self.game.get_current_player().hand:
+            for wc in self.players_cards:
+                if wc.card == pc:
+                    continue
+
+            self.drawn_card(self.game.get_current_player(), pc)
+
 
     def quit_game(self, src):
         import main_menu

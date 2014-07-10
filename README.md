@@ -31,14 +31,24 @@ BUGS
 Cards not working or need to be tested
 ==
 
-- Power ring
+- HEAT VISION
 
-- Heat vision
+- AQUAMAN'S TRIDENT
 
 - Green latern bonus need to only apply once
 
 - Mera
 
-- The Penguin
+- Lobo
+
+- Robin
+
+- PRINCESS DIANA OF THEMYSCIRA
+
+- CHEETAH
+
+- SUPERGIRL
+
+- THE BAT-SIGNAL
 
 - many more...

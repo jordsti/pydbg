@@ -208,6 +208,7 @@ class game_object:
                     cur_player.next_hand_size += bonus.bonus.nb
                     self.game_message("Bonus from %s : +%d card(s) for next hand" % (cur_player.superhero.name, bonus.bonus.nb))
 
+
                 bonus.applied = True
 
     def complete_choice(self, choice):
@@ -215,8 +216,6 @@ class game_object:
         if not choice.completed:
             for c in choice.selected_cards:
                 if choice.destination == player.player_choice.DestroyCard:
-                    #todo
-                    #way to handle destroyed, new list ?
                     if c in choice.player.hand:
                         choice.player.hand.remove(c)
                     elif c in choice.player.discard_pile:
@@ -224,6 +223,30 @@ class game_object:
 
                     self.destroyed_cards.append(c)
                     self.game_message("Card %s destroyed by %s" % (c.name, choice.player.name))
+                elif choice.destination == player.player_choice.Hand:
+                    #kick girl
+                    for sc in choice.selected_cards:
+                        choice.player.hand.append(sc)
+
+                        if sc in self.buyable_powers:
+                            self.buyable_powers.remove(sc)
+                        #other card
+                        if sc in self.lineups:
+                            actions = [lineup_action(sc, lineup_action.Removed)]
+                            self.lineup_changed(actions)
+                            self.lineups.remove(sc)
+
+                        if sc in choice.player.discard_pile:
+                            choice.player.discard_pile.remove(sc)
+
+                elif choice.destination == player.player_choice.GainedCard:
+                    for sc in choice.selected_cards:
+                        choice.player.gained_cards.append(sc)
+
+                        if sc in self.lineups:
+                            actions = [lineup_action(sc, lineup_action.Removed)]
+                            self.lineup_changed(actions)
+                            self.lineups.remove(sc)
 
                 elif choice.destination == player.player_choice.PlayerDeckTop:
                     #aquaman testing
@@ -299,6 +322,30 @@ class game_object:
                                 self.propose_player_choice(choice)
         # todo card abilities
 
+        # aquaman's trident card
+        for pc in current.played_cards:
+            for a in pc.abilities:
+                if a.type == cards.ability.EndOfTurn:
+                    if a.condition is None:
+                        if a.action is not None:
+                            if a.action.type == cards.card_action.ChooseCard:
+                                cards_choice = []
+                                if a.action.source == cards.card_action.GainedCard:
+                                    for gc in current.gained_cards:
+                                        if a.action.respect_constraint(gc):
+                                            cards_choice.append(gc)
+
+                                dest = None
+                                if a.action.source == cards.card_action.PlayerDeckTop:
+                                    dest = player.player_choice.PlayerDeckTop
+
+                                if dest is not None:
+                                    if len(cards_choice) > 0:
+                                        choice = player.player_choice(cards_choice, dest, 1, not a.action.forced)
+                                        self.propose_player_choice(choice)
+                                    else:
+                                        self.game_message("[%s] No cards eligible" % pc.name)
+
     def propose_player_choice(self, choice):
         cur_player = self.get_current_player()
         self.player_choices.append(choice)
@@ -338,11 +385,11 @@ class game_object:
                             #flash case
                             for a in played_card.abilities:
                                 if a.bonus is not None:
-                                    if a.bonus.type == cards.get_bonus_type(ability.condition.value):
-
+                                    if a.bonus.type == cards.get_bonus_type(a.condition.value):
                                         sb = cards.superhero_bonus(player.superhero, ability, ability.bonus)
 
                                         if not player.contains_superhero_bonus(sb):
+                                            print "THE FLASH"
                                             player.superhero_bonuses.append(sb)
 
                     elif ability.condition.test == cards.condition.CardType:
@@ -423,10 +470,12 @@ class game_object:
 
             elif a.condition is None and a.bonus is None:
                 #the penguin discard action
+                print "card_action"
                 if a.action is not None:
                     if a.action.type == cards.card_action.ChooseCard:
                         print "choose card"
                         print "heat vision case"
+
                         cards_choice = []
                         if a.action.source == cards.card_action.Hand:
                             for pcard in cur_player.hand:
@@ -437,23 +486,39 @@ class game_object:
                                 if a.action.respect_constraint(pcard):
                                     cards_choice.append(pcard)
                         elif a.action.source == cards.card_action.HandAndDiscardPile:
+                            print "Heat Vision 2"
                             for pcard in cur_player.hand:
                                 if a.action.respect_constraint(pcard):
                                     cards_choice.append(pcard)
                             for pcard in cur_player.discard_pile:
                                 if a.action.respect_constraint(pcard):
                                     cards_choice.append(pcard)
+                        elif a.action.source == cards.card_action.BuyablePower:
+                            if len(self.buyable_powers) > 0:
+                                cards_choice.append(self.buyable_powers[0])
+                        elif a.action.source == cards.card_action.LineUp:
+                            for lc in self.lineups:
+                                if a.action.respect_constraint(lc):
+                                    cards_choice.append(lc)
 
                         dest = None
                         if a.action.destination == cards.card_action.DestroyedCard:
                             dest = player.player_choice.DestroyCard
                         elif a.action.destination == cards.card_action.DiscardPile:
                             dest = player.player_choice.DiscardCard
+                        elif a.action.destination == cards.card_action.Hand:
+                            dest = player.player_choice.Hand
+                        elif a.action.destination == cards.card_action.GainedCard:
+                            dest = player.player_choice.GainedCard
+                        elif a.action.destination == cards.card_action.PlayerDeckTop:
+                            dest = player.player_choice.PlayerDeckTop
                         # elif
                         # todo other card case
                         if len(cards_choice) > 0 and dest is not None:
                             choice = player.player_choice(cards_choice, cur_player, dest, a.action.count, not a.action.forced, a.bonus)
                             self.propose_player_choice(choice)
+                        elif len(cards_choice) == 0:
+                            self.game_message("[%s] No card eligible" % card.name)
             else:
                 condition_ok = False
                 bonuses = []

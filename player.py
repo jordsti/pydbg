@@ -51,7 +51,8 @@ class player:
 
 
 class player_choice:
-    (DiscardCard, DestroyCard, PlayerDeckTop, PlayerDeckBottom) = (0, 1, 2, 3)
+    #todo some text info like which card is resulting in this
+    (DiscardCard, DestroyCard, PlayerDeckTop, PlayerDeckBottom, Hand, LineUp, GainedCard) = (0, 1, 2, 3, 4, 5, 6)
 
     def __init__(self, cards, player, destination=DiscardCard, count=1, may=False, bonus=None):
         self.may = may

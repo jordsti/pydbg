@@ -27,23 +27,23 @@ class library:
 
         for l in lines:
             l = l.rstrip('\n').rstrip('\r')
-
-            if l.startswith("name:"):
-                self.name = l[5:]
-            elif l.startswith("count:"):
-                l = l[6:]
-                data = l.split(",")
-                self.cards_count[data[0]] = int(data[1])
-            elif l.startswith("starter:"):
-                l = l[8:]
-                data = l.split(",")
-                self.starter_cards[data[0]] = int(data[1])
-            elif l.startswith("curse:"):
-                self.curse_card = l[6:]
-            elif l.startswith("buyable_power:"):
-                self.buyable_power = l[14:]
-            elif l.startswith("first_supervilain:"):
-                self.first_supervilain = l[18:]
+            if not l.startswith("#"):
+                if l.startswith("name:"):
+                    self.name = l[5:]
+                elif l.startswith("count:"):
+                    l = l[6:]
+                    data = l.split(",")
+                    self.cards_count[data[0]] = int(data[1])
+                elif l.startswith("starter:"):
+                    l = l[8:]
+                    data = l.split(",")
+                    self.starter_cards[data[0]] = int(data[1])
+                elif l.startswith("curse:"):
+                    self.curse_card = l[6:]
+                elif l.startswith("buyable_power:"):
+                    self.buyable_power = l[14:]
+                elif l.startswith("first_supervilain:"):
+                    self.first_supervilain = l[18:]
 
         files = os.listdir(lib_dir)
 
