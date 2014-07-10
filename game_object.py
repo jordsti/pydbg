@@ -36,6 +36,8 @@ class game_object:
         self.ask_player = None
         self.game_text = None
 
+        self.refresh_hands = None
+
         self.player_choices = []
         self.pending_choice = None
 
@@ -275,7 +277,9 @@ class game_object:
                     if choice.bonus.type == cards.bonus.Power:
                         choice.player.total_power += choice.bonus.nb
                         self.game_message("Bonus from completed action : +%d Power" % choice.bonus.nb)
-
+            # todo refresh game board
+            if self.refresh_hands is not None:
+                self.refresh_hands()
             print "Choice completed"
         else:
             print "Choice already completed !"
@@ -472,7 +476,7 @@ class game_object:
                 #the penguin discard action
                 print "card_action"
                 if a.action is not None:
-                    if a.action.type == cards.card_action.ChooseCard:
+                    if a.action.type == cards.card_action.ChooseCard or a.action.type == cards.card_action.MayDestroyCard:
                         print "choose card"
                         print "heat vision case"
 

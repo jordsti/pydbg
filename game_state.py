@@ -162,7 +162,19 @@ class game_state(gui.gui_state):
         self.game.drawn_card = self.drawn_card
         self.game.ask_player = self.ask_player
         self.game.game_text = self.ta_actions.append
+        self.game.refresh_hands = self.refresh_hands
         self.game.start_game()
+
+    def refresh_hands(self):
+        cur_player = self.game.get_current_player()
+        to_remove = []
+        for w in self.players_cards:
+            if w.card not in cur_player.hand:
+                to_remove.append(w)
+
+        for w in to_remove:
+            self.players_cards.remove(w)
+            self.elements.remove(w)
 
     def ask_player(self, player, choice):
         if self.choice_overlay is None:
@@ -311,15 +323,15 @@ class game_state(gui.gui_state):
         if len(self.game.buyable_powers) > 0:
             self.buyable_power_stack.activated = self.buy_card
 
-    def player_turn(self, player):
-        self.ta_actions.append("Player turn : " + player.name)
-        self.lbl_current_turn.text = "%s's turn !" % player.name
-        self.current_player = player
+    def player_turn(self, cur_player):
+        self.ta_actions.append("Player turn : " + cur_player.name)
+        self.lbl_current_turn.text = "%s's turn !" % cur_player.name
+        self.current_player = cur_player
         #card view
-        cards = player.hand
+        player_cards = cur_player.hand
 
         ix = 0
-        for c in cards:
+        for c in player_cards:
             widget = card_widget(self, c, self.hand_width, self.hand_height)
             widget.x = self.hand_x + ix
             widget.y = self.hand_y

@@ -34,6 +34,8 @@ def get_bonus_type(text):
         return bonus.CostReduction
     elif text == 'DrawCard':
         return bonus.DrawCard
+    elif text == 'NextHandCard':
+        return bonus.NextHandCard
 
     return None
 
