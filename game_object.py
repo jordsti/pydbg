@@ -352,6 +352,10 @@ class game_object:
 
     def propose_player_choice(self, choice):
         cur_player = self.get_current_player()
+
+        #debug trace
+        print "Proposing choice %s, %d, %d" % (cur_player.name, choice.destination, len(choice.cards))
+
         self.player_choices.append(choice)
 
         if self.pending_choice is None:
@@ -453,16 +457,16 @@ class game_object:
                                 if sb not in player.superhero_bonuses:
                                     player.superhero_bonuses.append(sb)
 
-    def apply_card(self, card):
+    def apply_card(self, played_card):
         cur_player = self.get_current_player()
 
-        for a in card.abilities:
+        for a in played_card.abilities:
             if a.condition is None and a.bonus is not None:
                 if a.type == cards.ability.Passive:
-                    print "Bonus from %s, %d, %d" % (card.name, a.bonus.type, a.bonus.nb)
+                    print "Bonus from %s, %d, %d" % (played_card.name, a.bonus.type, a.bonus.nb)
                     if a.bonus.type == cards.bonus.Power:
                         cur_player.total_power += a.bonus.nb
-                        self.game_message("Bonus from %s : +%d Power" % (card.name, a.bonus.nb))
+                        self.game_message("Bonus from %s : +%d Power" % (played_card.name, a.bonus.nb))
                     elif a.bonus.type == cards.bonus.DrawCard:
                         for i in range(a.bonus.nb):
                             c = self.draw_player_card(cur_player)
@@ -470,7 +474,7 @@ class game_object:
 
                             if self.drawn_card is not None:
                                 self.drawn_card(cur_player, c)
-                        self.game_message("Bonus from %s : Draw %d card(s)" % (card.name, a.bonus.nb))
+                        self.game_message("Bonus from %s : Draw %d card(s)" % (played_card.name, a.bonus.nb))
 
             elif a.condition is None and a.bonus is None:
                 #the penguin discard action
@@ -481,21 +485,32 @@ class game_object:
                         print "heat vision case"
 
                         cards_choice = []
+                        print "source : %d, %d" % (a.action.source, cards.card_action.Hand)
+                        print "Player Info %s, Deck : %d, Hand : %d, Gained Cards : %d" % (cur_player.name, cur_player.deck.count(), len(cur_player.hand), len(cur_player.gained_cards))
                         if a.action.source == cards.card_action.Hand:
                             for pcard in cur_player.hand:
+                                print "DEBUG : card name : %s" % pcard.name
                                 if a.action.respect_constraint(pcard):
+                                    print "DEBUG : addded to selection"
                                     cards_choice.append(pcard)
+
                         elif a.action.source == cards.card_action.DiscardPile:
                             for pcard in cur_player.discard_pile:
+                                print "DEBUG : card name : %s" % pcard.name
                                 if a.action.respect_constraint(pcard):
+                                    print "DEBUG : addded to selection"
                                     cards_choice.append(pcard)
                         elif a.action.source == cards.card_action.HandAndDiscardPile:
                             print "Heat Vision 2"
                             for pcard in cur_player.hand:
+                                print "DEBUG : card name : %s" % pcard.name
                                 if a.action.respect_constraint(pcard):
+                                    print "DEBUG : addded to selection"
                                     cards_choice.append(pcard)
                             for pcard in cur_player.discard_pile:
+                                print "DEBUG : card name : %s" % pcard.name
                                 if a.action.respect_constraint(pcard):
+                                    print "DEBUG : addded to selection"
                                     cards_choice.append(pcard)
                         elif a.action.source == cards.card_action.BuyablePower:
                             if len(self.buyable_powers) > 0:
@@ -522,7 +537,7 @@ class game_object:
                             choice = player.player_choice(cards_choice, cur_player, dest, a.action.count, not a.action.forced, a.bonus)
                             self.propose_player_choice(choice)
                         elif len(cards_choice) == 0:
-                            self.game_message("[%s] No card eligible" % card.name)
+                            self.game_message("[%s] No card eligible" % played_card.name)
             else:
                 condition_ok = False
                 bonuses = []
@@ -594,22 +609,22 @@ class game_object:
                                 #power ring
                                 revealed_card = cur_player.deck.reveal()
 
-                                self.game_message("[%s] Deck Top Card reveal : %s , Cost : %d" % (card.name, revealed_card.name, revealed_card.cost))
+                                self.game_message("[%s] Deck Top Card reveal : %s , Cost : %d" % (played_card.name, revealed_card.name, revealed_card.cost))
                                 if revealed_card.cost >= int(c.count):
                                     bonuses.append(a.bonus)
                                     condition_ok = True
 
                 if condition_ok:
                     for b in bonuses:
-                        print "Bonus from %s, %d, %d" % (card.name, b.type, b.nb)
+                        print "Bonus from %s, %d, %d" % (played_card.name, b.type, b.nb)
                         if b.type == cards.bonus.Power:
                             cur_player.total_power += b.nb
-                            self.game_message("Bonus from %s : +%d Power" % (card.name, b.nb))
+                            self.game_message("Bonus from %s : +%d Power" % (played_card.name, b.nb))
                         elif b.type == cards.bonus.DrawCard:
                             for i in range(b.nb):
                                 c = self.draw_player_card(cur_player)
                                 cur_player.hand.append(c)
-                            self.game_message("Bonus from %s : Draw %d card(s)" % (card.name, b.nb))
+                            self.game_message("Bonus from %s : Draw %d card(s)" % (played_card.name, b.nb))
 
     def draw_player_card(self, cur_player):
         if cur_player.deck.empty():

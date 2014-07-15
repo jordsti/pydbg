@@ -59,6 +59,7 @@ class card_action:
     def respect_constraint(self, card):
         for c in self.constraints:
             if not c.pass_condition(card):
+                print "Constraint false : %d, %s, %d" % (c.test, c.value, c.var)
                 return False
 
         return True

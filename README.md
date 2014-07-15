@@ -37,8 +37,6 @@ Cards not working or need to be tested
 
 - Green latern bonus need to only apply once
 
-- Mera
-
 - Lobo
 
 - Robin
@@ -52,3 +50,8 @@ Cards not working or need to be tested
 - THE BAT-SIGNAL
 
 - many more...
+
+Working
+==
+
+- Mera

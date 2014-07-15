@@ -10,6 +10,9 @@ class card_deck:
     def push(self, card):
         self.__cards.append(card)
 
+    def count(self):
+        return len(self.__cards)
+
     def pop(self):
         i = len(self.__cards)
         if i > 0:

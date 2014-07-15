@@ -29,6 +29,7 @@ class card_constraint(constraint):
         if nb_vars >= 2:
             #value
             self.value = vars[1]
+            print self.value
 
         if nb_vars >= 3:
             #test
@@ -55,6 +56,9 @@ class card_constraint(constraint):
             #only equals is handled !!
             if obj.card_type == self.value:
                 return True
+            else:
+                print "Type Failed"
+                print obj.card_type, self.value
         elif self.var == self.Power:
             pass
             #todo , little problem here, need to parse the power with abilites..
