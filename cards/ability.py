@@ -168,9 +168,6 @@ class ability:
                 a = card_action.card_action()
                 a.from_string(action)
                 self.action = a
-                print "[DEBUG] Ability Constraint Count %d" % len(self.action.constraints), a
-                for c in self.action.constraints:
-                    print "[DEBUG]", c
 
 class superhero_bonus:
     def __init__(self, superhero, ability, bonus):

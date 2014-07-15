@@ -313,8 +313,6 @@ class game_object:
                                 source = current.gained_cards
 
                             for scard in source:
-                                for c in a.action.constraints:
-                                    print "[%s] Constraints %d, %s, %d" % (_superhero.name, c.var, c.value, c.test)
                                 if a.action.respect_constraint(scard):
                                     selected_cards.append(scard)
 

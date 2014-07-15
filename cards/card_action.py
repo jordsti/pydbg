@@ -52,20 +52,16 @@ class card_action:
             _constraints = const.split(';')
 
             i = 0
-            print "[DEBUG] Parsing card_action", len(_constraints)
             for c in _constraints:
                 if len(c) > 0:
-                    print "Constraint %d : %s" % (i, c)
                     cc = card_constraint()
                     cc.from_string(c)
                     self.constraints.append(cc)
                     i += 1
 
     def respect_constraint(self, card):
-        print "Constraint count : %d" % len(self.constraints)
         for c in self.constraints:
             if not c.pass_condition(card):
-                print "Constraint false : %d, %s, %d" % (c.test, c.value, c.var)
                 return False
 
         return True
