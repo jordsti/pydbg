@@ -66,6 +66,12 @@ class library:
 
                 self.supervilains.append(sv)
 
+        #debug
+        for sh in self.superheroes:
+            for a in sh.abilities:
+                if a.action is not None:
+                    print "SH Constraints : %s, %d" % (sh.name, len(a.action.constraints))
+
     def get_starter(self):
 
         cards = []

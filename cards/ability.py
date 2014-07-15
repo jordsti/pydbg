@@ -1,5 +1,5 @@
 __author__ = 'JordSti'
-from card_action import card_action
+import card_action
 
 
 class bonus:
@@ -165,10 +165,12 @@ class ability:
 
             elif d.startswith("action:"):
                 action = d[7:]
-                a = card_action()
+                a = card_action.card_action()
                 a.from_string(action)
                 self.action = a
-
+                print "[DEBUG] Ability Constraint Count %d" % len(self.action.constraints), a
+                for c in self.action.constraints:
+                    print "[DEBUG]", c
 
 class superhero_bonus:
     def __init__(self, superhero, ability, bonus):

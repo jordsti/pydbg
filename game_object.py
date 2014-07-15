@@ -289,9 +289,9 @@ class game_object:
         current = self.get_current_player()
 
         #superhero abilites
-        superhero = current.superhero
+        _superhero = current.superhero
         #superhero.active check todo
-        for a in superhero.abilities:
+        for a in _superhero.abilities:
             if a.type == cards.ability.EndOfTurn:
                 if a.condition is not None:
                     if a.condition.cond == cards.condition.ForEach:
@@ -300,7 +300,7 @@ class game_object:
                                 #wonderwoman case
                                 for card in current.gained_cards:
                                     if card.card_type in a.condition.value:
-                                        sb = cards.superhero_bonus(superhero, a, a.bonus)
+                                        sb = cards.superhero_bonus(_superhero, a, a.bonus)
                                         current.superhero_bonuses.append(sb)
                 else:
                     #aquaman got no condition
@@ -312,9 +312,11 @@ class game_object:
                             if a.action.source == cards.card_action.GainedCard:
                                 source = current.gained_cards
 
-                            for card in source:
-                                if a.action.respect_constraint(card):
-                                    selected_cards.append(card)
+                            for scard in source:
+                                for c in a.action.constraints:
+                                    print "[%s] Constraints %d, %s, %d" % (_superhero.name, c.var, c.value, c.test)
+                                if a.action.respect_constraint(scard):
+                                    selected_cards.append(scard)
 
                             if len(selected_cards) > 0:
                                 #the player got to choose
@@ -324,6 +326,8 @@ class game_object:
 
                                 choice = player.player_choice(selected_cards, current, dest, a.action.count, not a.action.forced)
                                 self.propose_player_choice(choice)
+                            else:
+                                self.game_message("[%s] - No card eligible" % _superhero.name)
         # todo card abilities
 
         # aquaman's trident card

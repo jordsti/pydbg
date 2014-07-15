@@ -14,30 +14,29 @@ class card_constraint(constraint):
         self.var = var
 
     def from_string(self, text):
-        vars = text.split('-')
-        nb_vars = len(vars)
+        _vars = text.split('-')
+        nb_vars = len(_vars)
 
         if nb_vars >= 1:
             #var
-            if vars[0] == 'Cost':
+            if _vars[0] == 'Cost':
                 self.var = self.Cost
-            elif vars[0] == 'Power':
+            elif _vars[0] == 'Power':
                 self.var = self.Power
-            elif vars[0] == 'Type':
+            elif _vars[0] == 'Type':
                 self.var = self.Type
 
         if nb_vars >= 2:
             #value
-            self.value = vars[1]
-            print self.value
+            self.value = _vars[1]
 
         if nb_vars >= 3:
             #test
-            if vars[2] == 'Min':
+            if _vars[2] == 'Min':
                 self.test = self.Min
-            elif vars[2] == 'Max':
+            elif _vars[2] == 'Max':
                 self.test = self.Max
-            elif vars[2] == 'Equals':
+            elif _vars[2] == 'Equals':
                 self.test = self.Equals
 
     def pass_condition(self, obj):

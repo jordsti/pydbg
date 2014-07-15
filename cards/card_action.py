@@ -7,56 +7,62 @@ class card_action:
     (GainedCard, LineUp, MainDeckTop, PlayerDeckTop, DiscardPile, DestroyedCard, Hand, HandAndDiscardPile, BuyablePower) = (0, 1, 2, 3, 4, 5, 6, 7, 8)
     (Infinite) = -1
 
-    def __init__(self, type=ChooseCard, source=PlayerDeckTop, destination=DiscardPile, count=Infinite, forced=False, constraints=[]):
+    def __init__(self, type=ChooseCard, source=PlayerDeckTop, destination=DiscardPile, count=Infinite, forced=False):
         self.count = count
         self.forced = forced
         self.constraints = []
         self.type = type
         self.source = source
         self.destination = destination
-        self.constraints = constraints
+        self.constraints = []
 
     def from_string(self, text):
 
-        vars = text.split(':')
-        nb_vars = len(vars)
+        _vars = text.split(':')
+        nb_vars = len(_vars)
 
         if nb_vars >= 1:
-            if vars[0] == 'ChooseCard':
+            if _vars[0] == 'ChooseCard':
                 self.type = self.ChooseCard
-            elif vars[0] == 'MayDestroyCard':
+            elif _vars[0] == 'MayDestroyCard':
                 self.type = self.MayDestroyCard
 
         if nb_vars >= 2:
-            self.source = self.parse_loc(vars[1])
+            self.source = self.parse_loc(_vars[1])
 
         if nb_vars >= 3:
-            self.destination = self.parse_loc(vars[2])
+            self.destination = self.parse_loc(_vars[2])
 
         if nb_vars >= 4:
-            if vars[3] == 'Infinite':
+            if _vars[3] == 'Infinite':
                 self.count = self.Infinite
             else:
-                self.count = int(vars[3])
+                self.count = int(_vars[3])
 
         if nb_vars >= 5:
-            if vars[4] == 'True':
+            if _vars[4] == 'True':
                 self.forced = True
             else:
                 self.forced = False
 
         if nb_vars >= 6:
             #contraints support
-            const = vars[5]
+            const = _vars[5]
 
-            constraints = const.split(';')
+            _constraints = const.split(';')
 
-            for c in constraints:
-                cc = card_constraint()
-                cc.from_string(c)
-                self.constraints.append(cc)
+            i = 0
+            print "[DEBUG] Parsing card_action", len(_constraints)
+            for c in _constraints:
+                if len(c) > 0:
+                    print "Constraint %d : %s" % (i, c)
+                    cc = card_constraint()
+                    cc.from_string(c)
+                    self.constraints.append(cc)
+                    i += 1
 
     def respect_constraint(self, card):
+        print "Constraint count : %d" % len(self.constraints)
         for c in self.constraints:
             if not c.pass_condition(card):
                 print "Constraint false : %d, %s, %d" % (c.test, c.value, c.var)

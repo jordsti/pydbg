@@ -25,6 +25,8 @@ TO DO
 
 -Many other things that don't come to my mind at the moment...
 
+-Debug level for maximum console output !
+
 BUGS
 ===
 
