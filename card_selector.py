@@ -95,29 +95,29 @@ class card_selector(gui.widget):
             self.cards_image[card] = img
 
     def on_key(self, event):
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_UP and self.card_position > 0:
+                self.card_position -= 1
 
-        if event.key == pygame.K_UP and self.card_position > 0:
-            self.card_position -= 1
+            elif event.key == pygame.K_DOWN and self.card_position < len(self.cards):
+                self.card_position += 1
 
-        elif event.key == pygame.K_DOWN and self.card_position < len(self.cards):
-            self.card_position += 1
+            elif event.key == pygame.K_ESCAPE:
+                if self.closing is not None:
+                    self.closing(self)
 
-        elif event.key == pygame.K_ESCAPE:
-            if self.closing is not None:
-                self.closing(self)
+            elif event.key == pygame.K_RETURN and event.type == pygame.KEYUP:
+                if len(self.possible_choice) > self.card_position:
+                    if len(self.selected_cards) < self.choice.count or self.choice.count == -1:
+                        print "selecting card : ", self.card_position
+                        card = self.possible_choice[self.card_position]
+                        self.selected_cards.append(card)
+                        self.possible_choice.remove(card)
 
-        elif event.key == pygame.K_RETURN and event.type == pygame.KEYUP:
-            if len(self.possible_choice) > self.card_position:
-                if len(self.selected_cards) < self.choice.count or self.choice.count == -1:
-                    print "selecting card : ", self.card_position
-                    card = self.possible_choice[self.card_position]
-                    self.selected_cards.append(card)
-                    self.possible_choice.remove(card)
+                        if self.card_position == len(self.possible_choice) and self.card_position > 0:
+                            self.card_position -= 1
 
-                    if self.card_position == len(self.possible_choice) and self.card_position > 0:
-                        self.card_position -= 1
-
-        print "Current Card : ", self.card_position  # debug purpose
+            print "Current Card : ", self.card_position  # debug purpose
 
     def on_mouse_over(self, rel_x, rel_y):
         if self.btn_accept.contains(rel_x, rel_y):

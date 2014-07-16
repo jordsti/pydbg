@@ -4,6 +4,7 @@ import gui
 import main_menu
 import sys
 import os
+import logger
 
 if __name__ == '__main__':
     #python deck build game
@@ -39,6 +40,12 @@ if __name__ == '__main__':
                 if len(data) == 2:
                     width = int(data[0])
                     height = int(data[1])
+        elif arg == '-d' or arg == '--debug':
+            logger.set_output_level(logger.logger.Debug)
+            print "Debug Output, Have fun !"
+        elif arg == '-v' or arg == '--verbose':
+            logger.set_output_level(logger.logger.Verbose)
+
         i += 1
 
     print "Python Deck Building Game"

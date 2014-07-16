@@ -42,6 +42,8 @@ Cards not working or need to be tested
 - Lobo
 
 - Robin
+    Card from chosen doesn't appear in the player hand
+    unable to finish the turn after
 
 - PRINCESS DIANA OF THEMYSCIRA
 

@@ -270,23 +270,32 @@ class game_state(gui.gui_state):
         self.refresh_player_hand()
 
     def refresh_player_hand(self):
+        self.refresh_hands()
+        return
 
+        #todo planing a remove on this!
+        print "[DEBUG] refresh player hand"
         to_remove = []
+        cur_player = self.game.get_current_player()
 
         for wc in self.players_cards:
-            if wc.card not in self.game.get_current_player().hand:
+            if wc.card not in cur_player.hand:
                 to_remove.append(wc)
+                print "[DEBUG] Removing %s" % wc.card.name
+
         for wc in to_remove:
             self.players_cards.remove(wc)
             self.elements.remove(wc)
 
-        for pc in self.game.get_current_player().hand:
+        for pc in cur_player.hand:
             for wc in self.players_cards:
                 if wc.card == pc:
                     continue
 
-            self.drawn_card(self.game.get_current_player(), pc)
+            print "[DEBUG] adding card %s" % pc.name
+            self.drawn_card(cur_player, pc)
 
+        print "[DEBUG] refresh players hand %d" % len(self.players_cards)
 
     def quit_game(self, src):
         import main_menu

@@ -10,6 +10,7 @@ deck/pack1/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*.log
 
 # C extensions
 *.so
